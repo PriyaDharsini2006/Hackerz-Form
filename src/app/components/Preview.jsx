@@ -8,29 +8,7 @@ export function Preview({ form }) {
   const [email, setEmail] = useState('')
   const [answers, setAnswers] = useState({})
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    try {
-      const response = await fetch(`/api/forms/${form.id}/responses`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,  
-          answers: Object.entries(answers).map(([questionId, value]) => ({
-            questionId,
-            value,
-          })),
-        }),
-      })
-
-      if (response.ok) {
-        router.push(`/forms/${form.id}/success`)
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error)
-    }
-  }
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
