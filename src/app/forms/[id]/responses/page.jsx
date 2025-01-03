@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { ResponsesList } from '@/app/components/ResponsesList'
 
-export default async function ResponsesPage({ params  }) {
+export default async function ResponsesPage({ params }) {
   const form = await prisma.form.findUnique({
     where: { id: params.id },
     include: {
@@ -22,9 +22,9 @@ export default async function ResponsesPage({ params  }) {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">{form.title} - Responses</h2>
         <a
-          href={`/api/forms/${form.id}/responses`}
+          href={`/api/forms/${form.id}/responses?format=csv`}
           className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          download
+          download={`${form.title}-responses.csv`}
         >
           Export CSV
         </a>

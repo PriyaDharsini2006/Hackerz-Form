@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createObjectCsvWriter } from 'csv-writer'
 import path from 'path'
-import { mkdir, readFile } from 'fs/promises'
+import { mkdir, readFile, unlink } from 'fs/promises'
 
 export async function GET(request, { params }) {
   try {
@@ -59,27 +59,39 @@ export async function GET(request, { params }) {
         return record
       })
 
-      // Ensure tmp directory exists
-      const tmpDir = path.join(process.cwd(), 'tmp')
-      await mkdir(tmpDir, { recursive: true })
+      try {
+        // Ensure tmp directory exists
+        const tmpDir = path.join(process.cwd(), 'tmp')
+        await mkdir(tmpDir, { recursive: true })
 
-      const csvPath = path.join(tmpDir, `form-${params.formId}.csv`)
-      const csvWriter = createObjectCsvWriter({
-        path: csvPath,
-        header: headers,
-      })
+        const csvPath = path.join(tmpDir, `form-${params.formId}.csv`)
+        const csvWriter = createObjectCsvWriter({
+          path: csvPath,
+          header: headers,
+        })
 
-      await csvWriter.writeRecords(records)
+        await csvWriter.writeRecords(records)
 
-      // Read the file and return it
-      const fileContent = await readFile(csvPath, 'utf-8')
+        // Read the file
+        const fileContent = await readFile(csvPath)
 
-      return new NextResponse(fileContent, {
-        headers: {
-          'Content-Type': 'text/csv',
-          'Content-Disposition': `attachment; filename=form-${params.formId}.csv`,
-        },
-      })
+        // Clean up the temporary file
+        await unlink(csvPath).catch(console.error)
+
+        // Return the CSV with proper headers
+        return new NextResponse(fileContent, {
+          headers: {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': `attachment; filename="${form.title}-responses.csv"`,
+          },
+        })
+      } catch (error) {
+        console.error('Error generating CSV:', error)
+        return NextResponse.json(
+          { error: 'Error generating CSV' },
+          { status: 500 }
+        )
+      }
     }
 
     // Return JSON response if CSV is not requested
