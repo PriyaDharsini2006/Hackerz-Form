@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ArrowLeft } from 'lucide-react'
-import { signIn, useSession } from 'next-auth/react'
+import { signIn, useSession, signOut } from 'next-auth/react'
 
 export function FormView({ form }) {
   const router = useRouter()
@@ -11,12 +11,19 @@ export function FormView({ form }) {
   const [submitError, setSubmitError] = useState('')
   const [answers, setAnswers] = useState({})
 
+  const isValidEmail = session?.user?.email?.endsWith('@citchennai.net')
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitError('')
 
     if (!session?.user?.email) {
       await signIn('google')
+      return
+    }
+
+    if (!isValidEmail) {
+      setSubmitError('Please use a college email address')
       return
     }
 
@@ -47,6 +54,11 @@ export function FormView({ form }) {
       console.error('Error submitting form:', error)
       setSubmitError('An error occurred while submitting the form')
     }
+  }
+
+  const handleSwitchAccount = async () => {
+    await signOut({ redirect: false })
+    await signIn('google')
   }
 
   return (
@@ -113,6 +125,11 @@ export function FormView({ form }) {
                   ? 'Loading...' 
                   : session?.user?.email || 'Please sign in to submit the form'}
               </p>
+              {session?.user?.email && !isValidEmail && (
+                <p className="text-red-400 text-sm mt-2">
+                  Please use college email address
+                </p>
+              )}
             </div>
             {!session && (
               <button
@@ -120,6 +137,14 @@ export function FormView({ form }) {
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors"
               >
                 Sign in with Google
+              </button>
+            )}
+            {session && (
+              <button
+                onClick={handleSwitchAccount}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors"
+              >
+                Switch Account
               </button>
             )}
           </div>
@@ -243,7 +268,7 @@ export function FormView({ form }) {
 
           <button
             type="submit"
-            disabled={!session}
+            disabled={!session || !isValidEmail}
             className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-all hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-purple-600"
           >
             Submit Form
