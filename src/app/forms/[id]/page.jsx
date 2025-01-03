@@ -15,9 +15,6 @@ export default async function FormPage({ params  }) {
     <>
      
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-       
-      
-      <h2 className="text-xl font-semibold mb-6">{form.title}</h2>
       
       <FormView form={form} />
     </div>

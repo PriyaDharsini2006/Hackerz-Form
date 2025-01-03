@@ -20,7 +20,6 @@ export default async function ResponsesPage({ params  }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">{form.title} - Responses</h2>
         <a
           href={`/api/forms/${form.id}/responses`}
           className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
