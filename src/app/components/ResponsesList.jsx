@@ -4,7 +4,7 @@ import Image from 'next/image'
 export function ResponsesList({ form }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      <div className="relative w-full h-20 bg-black shadow-lg">
+      <div className="relative w-full h-20 from-gray-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
           <Image
             src="/logo1.png"
@@ -24,13 +24,13 @@ export function ResponsesList({ form }) {
       </div>
 
       <div className="relative w-full h-48 md:h-64">
-        <Image
+        {/* <Image
           src="/logo1.png"
           alt="Responses Banner"
           fill
           className="object-cover"
           priority
-        />
+        /> */}
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center px-4">
             {form.title} Responses
