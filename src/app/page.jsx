@@ -37,8 +37,8 @@ export default async function Home() {
                 Responses
               </Link>
               <Link
-                href={`/forms/preview`}
-                className="text-gray-500 hover:text-gray-600"
+                href={`/forms/preview/${form.id}`}
+                classNa me="text-gray-500 hover:text-gray-600"
               >
                 Preview
               </Link>

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
-import { FormView } from '@/app/components/FormView'
+
+import { Preview } from '@/app/components/Preview'
 
 export default async function FormPage({ params  }) {
   const form = await prisma.form.findUnique({
@@ -19,7 +20,7 @@ export default async function FormPage({ params  }) {
       
       <h2 className="text-xl font-semibold mb-6">{form.title}</h2>
       
-      <FormView form={form} />
+      <Preview form={form} />
     </div>
     </>
   )

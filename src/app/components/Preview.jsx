@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
-export function FormView({ form }) {
+export function Preview({ form }) {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [answers, setAnswers] = useState({})
