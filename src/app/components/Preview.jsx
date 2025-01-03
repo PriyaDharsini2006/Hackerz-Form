@@ -48,7 +48,7 @@ export function Preview({ form }) {
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form className="space-y-6">
             {form.description && (
               <p className="text-gray-300">{form.description}</p>
             )}
@@ -175,12 +175,6 @@ export function Preview({ form }) {
                 )}
               </div>
             ))}
-            <button
-              type="submit"
-              className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-all hover:scale-[1.02] shadow-lg"
-            >
-              Submit
-            </button>
           </form>
         </div>
       </div>
