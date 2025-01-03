@@ -74,7 +74,7 @@ export async function GET(
 
       await csvWriter.writeRecords(records)
 
-      // Read the file and return it
+      
       const fileContent = await readFile(csvPath, 'utf-8')
       
       return new NextResponse(fileContent, {
@@ -85,7 +85,7 @@ export async function GET(
       })
     }
 
-    // Return JSON response if CSV is not requested
+    
     return NextResponse.json(form.responses)
   } catch (error) {
     console.error('Error fetching responses:', error)
@@ -104,7 +104,7 @@ export async function POST(
     const body = await request.json()
     const { email, answers } = body
 
-    // Check if email already exists for this form
+    
     const existingResponse = await prisma.response.findUnique({
       where: {
         formId_email: {

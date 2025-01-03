@@ -18,18 +18,29 @@ model Form {
   responses   Response[]
 }
 
+// model Question {
+//   id       String     @id @default(cuid())
+//   formId   String
+//   form     Form       @relation(fields: [formId], references: [id], onDelete: Cascade)
+//   type     String     // "short" | "long" | "multiple" | "dropdown" | "checkbox"
+//   title    String
+//   options  String[]   // For multiple choice, dropdown, and checkbox
+//   required Boolean    @default(false)
+//   order    Int
+//   answers  Answer[]
+// }
 model Question {
   id       String     @id @default(cuid())
   formId   String
   form     Form       @relation(fields: [formId], references: [id], onDelete: Cascade)
-  type     String     // "short" | "long" | "multiple" | "dropdown" | "checkbox"
+  type     String     
   title    String
-  options  String[]   // For multiple choice, dropdown, and checkbox
+  options  String[]   
   required Boolean    @default(false)
   order    Int
+  imageUrl String?    // New field for image support
   answers  Answer[]
 }
-
 model Response {
   id        String   @id @default(cuid())
   formId    String

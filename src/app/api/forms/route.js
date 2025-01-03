@@ -38,6 +38,7 @@ export async function POST(request) {
             options: q.options || [],
             required: q.required,
             order: index,
+            imageUrl: q.imageUrl || '', 
           })),
         },
       },
