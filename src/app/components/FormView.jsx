@@ -3,20 +3,29 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ArrowLeft } from 'lucide-react'
+import { signIn, useSession } from 'next-auth/react'
 
 export function FormView({ form }) {
   const router = useRouter()
-  const [email, setEmail] = useState('')
+  const { data: session, status } = useSession()
+  const [submitError, setSubmitError] = useState('')
   const [answers, setAnswers] = useState({})
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setSubmitError('')
+
+    if (!session?.user?.email) {
+      await signIn('google')
+      return
+    }
+
     try {
       const response = await fetch(`/api/forms/${form.id}/responses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email,
+          email: session.user.email,
           answers: Object.entries(answers).map(([questionId, value]) => ({
             questionId,
             value,
@@ -26,9 +35,17 @@ export function FormView({ form }) {
 
       if (response.ok) {
         router.push(`/forms/${form.id}/success`)
+      } else {
+        const data = await response.json()
+        if (response.status === 400) {
+          setSubmitError('You have already filled the form')
+        } else {
+          setSubmitError(data.error || 'An error occurred while submitting the form')
+        }
       }
     } catch (error) {
       console.error('Error submitting form:', error)
+      setSubmitError('An error occurred while submitting the form')
     }
   }
 
@@ -86,18 +103,33 @@ export function FormView({ form }) {
         )}
 
         <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Email Address <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-gray-900/50 text-white border-b-2 border-purple-500 px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400 transition-colors"
-            placeholder="your@email.com"
-          />
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Email Address <span className="text-red-400">*</span>
+              </label>
+              <p className="text-gray-400">
+                {status === 'loading' 
+                  ? 'Loading...' 
+                  : session?.user?.email || 'Please sign in to submit the form'}
+              </p>
+            </div>
+            {!session && (
+              <button
+                onClick={() => signIn('google')}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors"
+              >
+                Sign in with Google
+              </button>
+            )}
+          </div>
         </div>
+
+        {submitError && (
+          <div className="bg-red-500/10 text-red-400 p-4 rounded-lg border border-red-500/50">
+            {submitError}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {form.questions.map((question) => (
@@ -211,7 +243,8 @@ export function FormView({ form }) {
 
           <button
             type="submit"
-            className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-all hover:scale-[1.02] shadow-lg"
+            disabled={!session}
+            className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-all hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-purple-600"
           >
             Submit Form
           </button>
