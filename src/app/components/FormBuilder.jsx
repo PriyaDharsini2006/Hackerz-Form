@@ -12,6 +12,7 @@ export function FormBuilder() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [newOption, setNewOption] = useState('')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [color, setColor] = useState('#9333EA')
   const dropdownRef = useRef(null)
 
   const questionTypes = [
@@ -144,13 +145,14 @@ export function FormBuilder() {
       const formData = {
         title,
         description,
+        color,
         questions: questions.map((q, index) => ({
           type: q.type,
           title: q.title.trim(),
           options: q.options,
           required: q.required,
           order: index,
-          imageUrl: q.imageUrl || '', // Make sure imageUrl is never undefined
+          imageUrl: q.imageUrl || '',
         })),
       }
 
@@ -229,6 +231,16 @@ export function FormBuilder() {
               rows={2}
               placeholder="Form Description"
             />
+
+            <div className="flex items-center gap-4">
+              <label className="text-gray-300">Form Color:</label>
+              <input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="h-8 w-16 rounded cursor-pointer"
+              />
+            </div>
           </form>
         </div>
 

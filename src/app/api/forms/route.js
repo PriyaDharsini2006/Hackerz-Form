@@ -24,13 +24,13 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const body = await request.json()
-    const { title, description, questions } = body
+    const { title, description, color, questions } = await request.json()
 
     const form = await prisma.form.create({
       data: {
         title,
         description,
+        color, 
         questions: {
           create: questions.map((q, index) => ({
             type: q.type,
@@ -38,7 +38,7 @@ export async function POST(request) {
             options: q.options || [],
             required: q.required,
             order: index,
-            imageUrl: q.imageUrl || '', 
+            imageUrl: q.imageUrl || '',
           })),
         },
       },
