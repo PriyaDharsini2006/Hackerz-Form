@@ -12,6 +12,11 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        redhat: ['Red Hat Display', 'sans-serif'],
+        hacked: ['Hacked', 'sans-serif'], 
+        grotesk: ['Space Grotesk', 'sans-serif'],
+      },
     },
   },
   plugins: [],

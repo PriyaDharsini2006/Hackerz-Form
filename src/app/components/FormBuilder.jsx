@@ -178,33 +178,34 @@ export function FormBuilder() {
   }
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      <div className="relative w-full h-20 from-gray-900 to-gray-800">
+      <div className="relative w-full h-25 from-gray-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
           <Image
-            src="/logo1.png"
+            src="/logo2.png"
             alt="Left Logo"
             width={120}
             height={40}
-            className="object-contain"
+            className="object-contain mt-[-10px]"
           />
+          <p className='text-white text-6xl font-hacked'>Hackerz <span className='text-[#00f5d0]'>Form</span></p>
           <Image
-            src="/logo2.png"
+            src="/logo1.png"
             alt="Right Logo"
             width={120}
             height={40}
-            className="object-contain"
+            className="object-contain mt-[8px]"
           />
         </div>
       </div>
 
       <div className="relative w-full h-48 md:h-64">
-        {/* <Image
+        <Image
           src="/logo1.png"
           alt="Form Builder Banner"
           fill
           className="object-cover"
           priority
-        /> */}
+        />
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center px-4">
             Create Form

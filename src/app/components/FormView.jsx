@@ -72,21 +72,22 @@ export function FormView({ form }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      <div className="relative w-full h-20 from-gray-900 to-gray-800">
+      <div className="relative w-full h-25 from-gray-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
           <Image
-            src="/logo1.png"
+            src="/logo2.png"
             alt="Left Logo"
             width={120}
             height={40}
-            className="object-contain"
+            className="object-contain mt-[-10px]"
           />
+          <p className='text-white text-6xl font-hacked'>Hackerz <span className='text-[#00f5d0]'>Form</span></p>
           <Image
-            src="/logo2.png"
+            src="/logo1.png"
             alt="Right Logo"
             width={120}
             height={40}
-            className="object-contain"
+            className="object-contain mt-[8px]"
           />
         </div>
       </div>
@@ -113,8 +114,8 @@ export function FormView({ form }) {
                 Email Address <span className="text-red-400">*</span>
               </label>
               <p className="text-gray-400">
-                {status === 'loading' 
-                  ? 'Loading...' 
+                {status === 'loading'
+                  ? 'Loading...'
                   : session?.user?.email || 'Please sign in to submit the form'}
               </p>
               {session?.user?.email && !isValidEmail && (
@@ -183,7 +184,7 @@ export function FormView({ form }) {
                     setAnswers({ ...answers, [question.id]: e.target.value })
                   }
                   className="w-full bg-gray-900/50 text-white border-b-2 px-3 py-2 rounded-lg focus:outline-none transition-colors"
-                  style={{ 
+                  style={{
                     borderColor: formColor,
                     ':focus': { borderColor: `${formColor}CC` }
                   }}
@@ -198,7 +199,7 @@ export function FormView({ form }) {
                   }
                   rows={4}
                   className="w-full bg-gray-900/50 text-white border-b-2 px-3 py-2 rounded-lg focus:outline-none transition-colors"
-                  style={{ 
+                  style={{
                     borderColor: formColor,
                     ':focus': { borderColor: `${formColor}CC` }
                   }}
@@ -218,7 +219,7 @@ export function FormView({ form }) {
                           setAnswers({ ...answers, [question.id]: e.target.value })
                         }
                         className="w-4 h-4 border-2 focus:ring-offset-gray-800"
-                        style={{ 
+                        style={{
                           borderColor: formColor,
                           color: formColor,
                           ':focus': { ringColor: formColor }
@@ -237,7 +238,7 @@ export function FormView({ form }) {
                     setAnswers({ ...answers, [question.id]: e.target.value })
                   }
                   className="w-full bg-gray-900/50 text-white border-b-2 px-3 py-2 rounded-lg focus:outline-none transition-colors"
-                  style={{ 
+                  style={{
                     borderColor: formColor,
                     ':focus': { borderColor: `${formColor}CC` }
                   }}
@@ -269,7 +270,7 @@ export function FormView({ form }) {
                           })
                         }}
                         className="w-4 h-4 rounded border-2 focus:ring-offset-gray-800"
-                        style={{ 
+                        style={{
                           borderColor: formColor,
                           color: formColor,
                           ':focus': { ringColor: formColor }

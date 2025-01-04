@@ -14,8 +14,8 @@ export default async function Home() {
 
   try {
     const admin = await prisma.admin.findUnique({
-      where: { 
-        email: session.user.email 
+      where: {
+        email: session.user.email
       }
     })
 
@@ -50,21 +50,22 @@ export default async function Home() {
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="relative w-full h-20 bg-black shadow-lg">
+        <div className="relative w-full h-25 from-gray-900 to-gray-800">
           <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             <Image
-              src="/logo1.png"
+              src="/logo2.png"
               alt="Left Logo"
               width={120}
               height={40}
-              className="object-contain"
+              className="object-contain mt-[-10px]"
             />
+            <p className='text-white text-3xl'>Hackerz Form</p>
             <Image
-              src="/logo2.png"
+              src="/logo1.png"
               alt="Right Logo"
               width={120}
               height={40}
-              className="object-contain"
+              className="object-contain mt-[8px]"
             />
           </div>
         </div>
@@ -151,7 +152,7 @@ export default async function Home() {
   } catch (error) {
     // Log the error server-side
     console.error('Error in Home page:', error)
-    
+
     // Return a user-friendly error page
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center">
