@@ -137,7 +137,7 @@ export function FormView({ form }) {
               <button
                 onClick={handleSwitchAccount}
                 style={buttonStyle}
-                className="px-4 py-2 text-white rounded-lg transition-colors"
+                className="px-4 py-2 text-black rounded-lg transition-colors"
               >
                 Switch Account
               </button>
@@ -295,12 +295,14 @@ export function FormView({ form }) {
                 backgroundColor: formColor
               }
             }}
-            className="w-full px-6 py-3 text-white rounded-xl transition-all hover:scale-[1.02] shadow-lg disabled:hover:scale-100"
+            className="w-full px-6 py-3 text-black rounded-xl transition-all hover:scale-[1.02] shadow-lg disabled:hover:scale-100"
           >
             Submit Form
           </button>
         </form>
+        <div className='mt-[10px]'><a className='bg-red-500 mt-[10px] text-white px-4 py-2 rounded hover:bg-red-600' href="/">Back</a></div>
       </div>
+      
     </div>
   )
 }
