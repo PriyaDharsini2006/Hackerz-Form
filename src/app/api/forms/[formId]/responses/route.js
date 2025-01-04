@@ -33,7 +33,6 @@ export async function GET(request, { params }) {
     const format = searchParams.get('format')
 
     if (format === 'csv') {
-      // Format data for CSV
       const headers = [
         { id: 'email', title: 'Email' },
         { id: 'submittedAt', title: 'Submitted At' },

@@ -17,11 +17,13 @@ model Form {
   title       String
   description String?
   color       String     @default("#9333EA") 
+  isActive    Boolean    @default(true)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   questions   Question[]
   responses   Response[]
 }
+
 
 model Question {
   id       String   @id @default(cuid())

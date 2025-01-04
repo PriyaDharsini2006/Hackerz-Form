@@ -1,4 +1,3 @@
-// app/api/forms/[formId]/route.ts
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
@@ -9,13 +8,15 @@ export async function PUT(
     try {
         const { formId } = params
         const body = await req.json()
-        const { title, description, questions } = body
+        const { title, description, questions, color, isActive } = body
 
         const updatedForm = await prisma.form.update({
             where: { id: formId },
             data: {
                 title,
                 description,
+                color,
+                isActive,
                 questions: {
                     deleteMany: {
                         formId,
@@ -31,7 +32,7 @@ export async function PUT(
                             options: question.options || [],
                             required: question.required,
                             order: index,
-                            imageUrl: question.imageUrl
+                            imageUrl: question.imageUrl || ''
                         },
                         update: {
                             type: question.type,
@@ -39,7 +40,7 @@ export async function PUT(
                             options: question.options || [],
                             required: question.required,
                             order: index,
-                            imageUrl: question.imageUrl
+                            imageUrl: question.imageUrl || ''
                         }
                     }))
                 }
@@ -55,9 +56,9 @@ export async function PUT(
 
         return NextResponse.json(updatedForm)
     } catch (error) {
-        console.error(error)
+        console.error('Error updating form:', error)
         return NextResponse.json(
-            { error: 'Failed to update form' },
+            { error: 'Failed to update form', details: error.message },
             { status: 500 }
         )
     }
