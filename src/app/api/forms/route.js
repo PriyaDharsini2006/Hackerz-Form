@@ -25,6 +25,8 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const { title, description, color, questions } = await request.json()
+    
+    console.log('Received questions:', questions); // Add this debug log
 
     const form = await prisma.form.create({
       data: {
@@ -32,18 +34,31 @@ export async function POST(request) {
         description,
         color, 
         questions: {
-          create: questions.map((q, index) => ({
-            type: q.type,
-            title: q.title,
-            options: q.options || [],
-            required: q.required,
-            order: index,
-            imageUrl: q.imageUrl || '',
-          })),
+          create: questions.map((q, index) => {
+            console.log('Creating question with imageUrl:', q.imageUrl); // Add this debug log
+            return {
+              type: q.type,
+              title: q.title,
+              options: q.options || [],
+              required: q.required,
+              order: index,
+              imageUrl: q.imageUrl || '',
+            };
+          }),
         },
       },
       include: {
-        questions: true,
+        questions: {
+          select: {
+            id: true,
+            type: true,
+            title: true,
+            options: true,
+            required: true,
+            order: true,
+            imageUrl: true, // Make sure this is included
+          }
+        },
       },
     })
 

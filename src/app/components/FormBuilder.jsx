@@ -78,28 +78,44 @@ export function FormBuilder() {
   }
 
   const handleImageUpload = async (id, file) => {
-    if (!file) return
-
+    if (!file) return;
+  
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (response.ok) {
-        const { url } = await response.json()
-        updateQuestion(id, { imageUrl: url })
-      } else {
-        throw new Error('Upload failed')
-      }
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64Data = reader.result;
+  
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            image: base64Data,
+          }),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+  
+        const { url } = await response.json();
+        console.log('Received image URL:', url);
+        setQuestions(prevQuestions => 
+          prevQuestions.map(q => 
+            q.id === id 
+              ? { ...q, imageUrl: url }
+              : q
+          )
+        );
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
-      console.error('Error uploading image:', error)
-      alert('Failed to upload image. Please try again.')
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image. Please try again.');
     }
-  }
+  };
+  
 
   const updateQuestion = (id, updates) => {
     setQuestions(
@@ -111,71 +127,75 @@ export function FormBuilder() {
     setQuestions(questions.filter((q) => q.id !== id))
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
+const handleSubmit = async (e) => {
+    e.preventDefault();
+  
     if (!title.trim()) {
-      alert('Please enter a form title')
-      return
+      alert('Please enter a form title');
+      return;
     }
-
+  
     if (questions.length === 0) {
-      alert('Please add at least one question')
-      return
+      alert('Please add at least one question');
+      return;
     }
-
-    const invalidQuestions = questions.filter(q => !q.title.trim())
+  
+    const invalidQuestions = questions.filter(q => !q.title.trim());
     if (invalidQuestions.length > 0) {
-      alert('Please fill in all question titles')
-      return
+      alert('Please fill in all question titles');
+      return;
     }
-
+  
     const invalidOptionQuestions = questions.filter(q =>
       (q.type === 'multiple' || q.type === 'dropdown' || q.type === 'checkbox') &&
       q.options.length === 0
-    )
+    );
     if (invalidOptionQuestions.length > 0) {
-      alert('Please add at least one option for all choice-based questions')
-      return
+      alert('Please add at least one option for all choice-based questions');
+      return;
     }
-
-    setIsSubmitting(true)
-
+  
+    setIsSubmitting(true);
+  
     try {
       const formData = {
         title,
         description,
         color,
-        questions: questions.map((q, index) => ({
-          type: q.type,
-          title: q.title.trim(),
-          options: q.options,
-          required: q.required,
-          order: index,
-          imageUrl: q.imageUrl || '',
-        })),
-      }
-
+        questions: questions.map((q, index) => {
+          console.log('Question image URL:', q.imageUrl); // Add this line
+          return {
+            type: q.type,
+            title: q.title.trim(),
+            options: q.options,
+            required: q.required,
+            order: index,
+            imageUrl: q.imageUrl || '',
+          };
+        }),
+      };
+      
+  
       const response = await fetch('/api/forms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
-
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+      });
+  
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to create form')
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create form');
       }
-
-      const data = await response.json()
-      router.push(`/forms/${data.id}`)
+  
+      const data = await response.json();
+      router.push(`/forms/${data.id}`);
     } catch (error) {
-      console.error('Error creating form:', error)
-      alert('Failed to create form. Please try again.')
+      console.error('Error creating form:', error);
+      alert('Failed to create form. Please try again.');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <div className="relative w-full h-25 from-gray-900 to-gray-800">
