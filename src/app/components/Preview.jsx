@@ -197,16 +197,16 @@ export function Preview({ form: initialForm }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <div className="relative w-full h-25 from-gray-900 to-gray-800">
-        <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
-          <Image
-            src="/logo2.png"
-            alt="Left Logo"
-            width={120}
-            height={40}
-            className="object-contain mt-[-10px]"
-          />
-          <p className='text-white text-6xl font-hacked'>Hackerz <span style={{ color: form.color }}>Forms</span></p>
-          <div className="flex items-center gap-4">
+        <div className="w-full py-4 sm:py-6 from-gray-900 to-gray-800">
+          <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
+            <Image
+              src="/logo2.png"
+              alt="Left Logo"
+              width={120}
+              height={40}
+              className="object-contain mt-[-10px]"
+            />
+            <p className='text-white text-4xl sm:text-6xl font-hacked'>Hackerz <span className='text-purple-500'>Forms</span></p>
             <Image
               src="/logo1.png"
               alt="Right Logo"
