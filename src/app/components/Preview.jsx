@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Pencil, Plus, Trash2, Save, X, Upload } from 'lucide-react'
+import { Pencil, Plus, Trash2, Save, X, Upload, GripVertical } from 'lucide-react'
 
 export function Preview({ form: initialForm }) {
   const router = useRouter()
@@ -11,6 +11,44 @@ export function Preview({ form: initialForm }) {
   const [email, setEmail] = useState('')
   const [answers, setAnswers] = useState({})
   const [isSaving, setIsSaving] = useState(false)
+  const [draggedQuestion, setDraggedQuestion] = useState(null)
+
+  const handleDragStart = (e, questionId) => {
+    setDraggedQuestion(questionId)
+    e.currentTarget.classList.add('opacity-50')
+  }
+
+  const handleDragEnd = (e) => {
+    e.currentTarget.classList.remove('opacity-50')
+    setDraggedQuestion(null)
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+  }
+
+  const handleDrop = (e, targetQuestionId) => {
+    e.preventDefault()
+    if (!draggedQuestion || draggedQuestion === targetQuestionId) return
+
+    const updatedQuestions = [...form.questions]
+    const draggedIndex = updatedQuestions.findIndex(q => q.id === draggedQuestion)
+    const targetIndex = updatedQuestions.findIndex(q => q.id === targetQuestionId)
+
+    const [draggedItem] = updatedQuestions.splice(draggedIndex, 1)
+    updatedQuestions.splice(targetIndex, 0, draggedItem)
+
+    const reorderedQuestions = updatedQuestions.map((q, index) => ({
+      ...q,
+      order: index
+    }))
+
+    setForm({
+      ...form,
+      questions: reorderedQuestions
+    })
+  }
+
   const formatDescription = (text) => {
     if (!text) return '';
     return text.split('\n').map((line, i) => (
@@ -53,6 +91,7 @@ export function Preview({ form: initialForm }) {
     }
   }
 
+
   const handleImageUpload = async (id, file) => {
     if (!file) return
 
@@ -78,11 +117,29 @@ export function Preview({ form: initialForm }) {
   }
 
   const toggleFormActive = async () => {
+    const updatedForm = {
+      ...form,
+      isActive: !form.isActive
+    }
+    setForm(updatedForm)
+
     try {
-      setForm(prev => ({ ...prev, isActive: !prev.isActive }))
-      await handleSaveForm()
+      const response = await fetch(`/api/edit/${form.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedForm),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to toggle form status')
+      }
+
+      router.refresh()
     } catch (error) {
       console.error('Error toggling form status:', error)
+      setForm(form)
     }
   }
 
@@ -158,10 +215,10 @@ export function Preview({ form: initialForm }) {
             />
             <button
               onClick={toggleFormActive}
-              className={`px-4 py-2 rounded ${form.isActive ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'
+              className={`px-4 py-2 rounded ${form.isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
                 } text-white transition-colors`}
             >
-              {form.isActive ? 'Activate' : 'Deactivate'}
+              {form.isActive ? 'Deactivate' : 'Activate'}
             </button>
           </div>
         )}
@@ -213,10 +270,22 @@ export function Preview({ form: initialForm }) {
             )}
 
             {form.questions.map((question, index) => (
-              <div key={question.id} className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50 transition-all hover:border-opacity-50" style={{ borderColor: form.color }}>
+              <div
+                key={question.id}
+                draggable={isEditing}
+                onDragStart={(e) => handleDragStart(e, question.id)}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, question.id)}
+                className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50 transition-all hover:border-opacity-50"
+                style={{ borderColor: form.color }}
+              >
                 {isEditing ? (
                   <div className="space-y-4">
-                    <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="cursor-move">
+                        <GripVertical size={20} className="text-gray-400" />
+                      </div>
                       <input
                         type="text"
                         value={question.title}
