@@ -14,7 +14,7 @@ export default function Page() {
             height={40}
             className="object-contain mt-[-10px]"
           />
-          <p className='text-white text-6xl font-hacked'>Hackerz <span className='text-purple-500'>Forms</span></p>
+          <p className='text-white text-4xl sm:text-6xl font-hacked'>Hackerz <span className='text-purple-500'>Forms</span></p>
           <Image
             src="/logo1.png"
             alt="Right Logo"
@@ -40,13 +40,6 @@ export default function Page() {
           <p className="text-gray-400 mb-8">
             Thank you for your response. Your submission has been recorded.
           </p>
-
-          <Link
-            href="/"
-            className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-all hover:scale-[1.02] shadow-lg"
-          >
-            Back to Forms
-          </Link>
         </div>
       </div>
     </div>

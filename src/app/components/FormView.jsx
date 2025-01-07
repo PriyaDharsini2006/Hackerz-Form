@@ -124,8 +124,8 @@ export function FormView({ form }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      
-      <div className="relative w-full h-25 from-gray-900 to-gray-800">
+
+      <div className="w-full py-4 sm:py-6 from-gray-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
           <Image
             src="/logo2.png"
@@ -134,7 +134,14 @@ export function FormView({ form }) {
             height={40}
             className="object-contain mt-[-10px]"
           />
-          <p className="text-white text-6xl font-hacked">Hackerz <span className="text-[#00f5d0]">Forms</span></p>
+          <p
+            className={`text-white font-hacked items-center ${window.innerWidth < 640 ? 'text-4xl' : 'text-6xl'
+              }`}
+          >
+            Hackerz <span className='text-[#00f5d0]'>Forms</span>
+          </p>
+
+
           <Image
             src="/logo1.png"
             alt="Right Logo"
@@ -145,71 +152,70 @@ export function FormView({ form }) {
         </div>
       </div>
 
-      <div className="relative w-full h-48 md:h-64">
-        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center px-4">
+      <div className="relative w-full h-32 sm:h-48 md:h-64">
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center p-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center">
             {form.title}
           </h1>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+      <div className="max-w-4xl mx-auto mt-[10px] px-4 py-6 sm:py-8 space-y-4 sm:space-y-6">
         {!form.isActive ? (
-          <div className="bg-red-500/10 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-red-500/50">
-            <p className="text-red-400 text-xl text-center font-semibold">
+          <div className="bg-red-500/10 backdrop-blur-lg rounded-xl shadow-xl p-4 sm:p-6 border border-red-500/50">
+            <p className="text-red-400 text-lg sm:text-xl text-center font-semibold">
               This form is currently deactivated
             </p>
           </div>
         ) : (
           <>
             {existingResponse && (
-              <div className="bg-blue-500/10 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-blue-500/50">
-                <p className="text-blue-400 text-lg font-semibold mb-2">
+              <div className="bg-blue-500/10 backdrop-blur-lg rounded-xl shadow-xl p-4 sm:p-6 border border-blue-500/50">
+                <p className="text-blue-400 text-base sm:text-lg font-semibold mb-2">
                   You're updating your previous response
                 </p>
-                <p className="text-gray-300 text-sm">
+                <p className="text-gray-300 text-xs sm:text-sm">
                   Last submitted: {new Date(existingResponse.updatedAt).toLocaleString()}
                 </p>
               </div>
             )}
 
             {form.description && (
-              <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
-                <p className="text-gray-300">{formatDescription(form.description)}</p>
+              <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-4 sm:p-6 border border-gray-700/50">
+                <p className="text-gray-300 text-sm sm:text-base">{formatDescription(form.description)}</p>
               </div>
             )}
 
-            <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
-              <div className="flex items-center justify-between">
+            <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-4 sm:p-6 border border-gray-700/50">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Email Address <span className="text-red-400">*</span>
                   </label>
-                  <p className="text-gray-400">
+                  <p className="text-gray-400 text-sm sm:text-base break-all">
                     {status === 'loading'
                       ? 'Loading...'
                       : session?.user?.email || 'Please sign in to submit the form'}
                   </p>
                   {session?.user?.email && !isValidEmail && (
-                    <p className="text-red-400 text-sm mt-2">
+                    <p className="text-red-400 text-xs sm:text-sm mt-2">
                       Please use college email address
                     </p>
                   )}
                 </div>
-                {!session && (
+                {!session ? (
                   <button
                     onClick={() => signIn('google')}
                     style={buttonStyle}
-                    className="px-4 py-2 text-white rounded-lg transition-colors"
+                    className="w-full sm:w-auto px-4 py-2 text-white rounded-lg transition-colors text-sm sm:text-base"
                   >
                     Sign in with Google
                   </button>
-                )}
-                {session && (
+                ) : (
                   <button
                     onClick={handleSwitchAccount}
                     style={buttonStyle}
-                    className="px-4 py-2 text-black rounded-lg transition-colors"
+                    className="w-full sm:w-auto px-4 py-2 text-black rounded-lg transition-colors text-sm sm:text-base"
                   >
                     Switch Account
                   </button>
@@ -218,36 +224,33 @@ export function FormView({ form }) {
             </div>
 
             {submitError && (
-              <div className="bg-red-500/10 text-red-400 p-4 rounded-lg border border-red-500/50">
+              <div className="bg-red-500/10 text-red-400 p-4 rounded-lg border border-red-500/50 text-sm sm:text-base">
                 {submitError}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {form.questions.map((question) => {
                 const previousAnswer = getPreviousAnswer(question.id);
                 return (
                   <div
                     key={question.id}
-                    className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50 transition-all"
-                    style={{ ':hover': { borderColor: `${formColor}50` } }}
+                    className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-4 sm:p-6 border border-gray-700/50 transition-all"
                   >
-                    <label className="block text-lg font-medium text-white mb-4">
+                    <label className="block text-base sm:text-lg font-medium text-white mb-4">
                       {question.title}
-                      {question.required && (
-                        <span className="text-red-400 ml-1">*</span>
-                      )}
+                      {question.required && <span className="text-red-400 ml-1">*</span>}
                     </label>
 
                     {previousAnswer && (
                       <div className="mb-4 p-3 bg-gray-800/50 rounded-lg border border-gray-600">
-                        <p className="text-sm text-gray-400">Previous answer:</p>
-                        <p className="text-gray-300">{previousAnswer}</p>
+                        <p className="text-xs sm:text-sm text-gray-400">Previous answer:</p>
+                        <p className="text-sm sm:text-base text-gray-300">{previousAnswer}</p>
                       </div>
                     )}
 
                     {question.imageUrl && (
-                      <div className="mb-4 relative h-48 w-full">
+                      <div className="mb-4 relative h-32 sm:h-48 w-full">
                         <Image
                           src={question.imageUrl}
                           alt={question.title}
@@ -258,13 +261,13 @@ export function FormView({ form }) {
                     )}
 
                     {question.link && (
-                      <div className="mb-4 flex">
+                      <div className="mb-4 flex flex-wrap">
                         <LinkIcon size={16} className="text-purple-400 mt-[5px]" />
                         <a
                           href={question.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-400 ml-[5px] hover:text-blue-300 underline break-all"
+                          className="text-blue-400 ml-[5px] hover:text-blue-300 underline break-all text-sm sm:text-base"
                           style={{ color: formColor }}
                         >
                           {question.link}
@@ -277,14 +280,9 @@ export function FormView({ form }) {
                         type="text"
                         required={question.required}
                         value={answers[question.id] || ''}
-                        onChange={(e) =>
-                          setAnswers({ ...answers, [question.id]: e.target.value })
-                        }
-                        className="w-full bg-gray-900/50 text-white border-b-2 px-3 py-2 rounded-lg focus:outline-none transition-colors"
-                        style={{
-                          borderColor: formColor,
-                          ':focus': { borderColor: `${formColor}CC` }
-                        }}
+                        onChange={(e) => setAnswers({ ...answers, [question.id]: e.target.value })}
+                        className="w-full bg-gray-900/50 text-white border-b-2 px-3 py-2 rounded-lg focus:outline-none transition-colors text-sm sm:text-base"
+                        style={{ borderColor: formColor }}
                       />
                     )}
 
@@ -292,15 +290,10 @@ export function FormView({ form }) {
                       <textarea
                         required={question.required}
                         value={answers[question.id] || ''}
-                        onChange={(e) =>
-                          setAnswers({ ...answers, [question.id]: e.target.value })
-                        }
+                        onChange={(e) => setAnswers({ ...answers, [question.id]: e.target.value })}
                         rows={4}
-                        className="w-full bg-gray-900/50 text-white border-b-2 px-3 py-2 rounded-lg focus:outline-none transition-colors"
-                        style={{
-                          borderColor: formColor,
-                          ':focus': { borderColor: `${formColor}CC` }
-                        }}
+                        className="w-full bg-gray-900/50 text-white border-b-2 px-3 py-2 rounded-lg focus:outline-none transition-colors text-sm sm:text-base"
+                        style={{ borderColor: formColor }}
                       />
                     )}
 
@@ -314,17 +307,11 @@ export function FormView({ form }) {
                               value={option}
                               checked={answers[question.id] === option}
                               required={question.required}
-                              onChange={(e) =>
-                                setAnswers({ ...answers, [question.id]: e.target.value })
-                              }
+                              onChange={(e) => setAnswers({ ...answers, [question.id]: e.target.value })}
                               className="w-4 h-4 border-2 focus:ring-offset-gray-800"
-                              style={{
-                                borderColor: formColor,
-                                color: formColor,
-                                ':focus': { ringColor: formColor }
-                              }}
+                              style={{ borderColor: formColor, color: formColor }}
                             />
-                            <span className="text-gray-300">{option}</span>
+                            <span className="text-gray-300 text-sm sm:text-base">{option}</span>
                           </label>
                         ))}
                       </div>
@@ -334,14 +321,9 @@ export function FormView({ form }) {
                       <select
                         required={question.required}
                         value={answers[question.id] || ''}
-                        onChange={(e) =>
-                          setAnswers({ ...answers, [question.id]: e.target.value })
-                        }
-                        className="w-full bg-gray-900/50 text-white border-b-2 px-3 py-2 rounded-lg focus:outline-none transition-colors"
-                        style={{
-                          borderColor: formColor,
-                          ':focus': { borderColor: `${formColor}CC` }
-                        }}
+                        onChange={(e) => setAnswers({ ...answers, [question.id]: e.target.value })}
+                        className="w-full bg-gray-900/50 text-white border-b-2 px-3 py-2 rounded-lg focus:outline-none transition-colors text-sm sm:text-base"
+                        style={{ borderColor: formColor }}
                       >
                         <option value="">Select an option</option>
                         {question.options.map((option) => (
@@ -361,23 +343,19 @@ export function FormView({ form }) {
                               value={option}
                               checked={(answers[question.id] || '').split(',').includes(option)}
                               onChange={(e) => {
-                                const currentValues = answers[question.id]?.split(',') || []
+                                const currentValues = answers[question.id]?.split(',') || [];
                                 const newValues = e.target.checked
                                   ? [...currentValues, option]
-                                  : currentValues.filter((v) => v !== option)
+                                  : currentValues.filter((v) => v !== option);
                                 setAnswers({
                                   ...answers,
                                   [question.id]: newValues.join(','),
-                                })
+                                });
                               }}
                               className="w-4 h-4 rounded border-2 focus:ring-offset-gray-800"
-                              style={{
-                                borderColor: formColor,
-                                color: formColor,
-                                ':focus': { ringColor: formColor }
-                              }}
+                              style={{ borderColor: formColor, color: formColor }}
                             />
-                            <span className="text-gray-300">{option}</span>
+                            <span className="text-gray-300 text-sm sm:text-base">{option}</span>
                           </label>
                         ))}
                       </div>
@@ -391,13 +369,9 @@ export function FormView({ form }) {
                 disabled={isSubmitting || !session || !isValidEmail}
                 style={{
                   ...buttonStyle,
-                  ':disabled': {
-                    opacity: 0.5,
-                    transform: 'scale(1)',
-                    backgroundColor: formColor,
-                  },
+                  opacity: (isSubmitting || !session || !isValidEmail) ? 0.5 : 1,
                 }}
-                className="w-full px-6 py-3 text-black rounded-xl transition-all hover:scale-[1.02] shadow-lg disabled:hover:scale-100"
+                className="w-full px-4 sm:px-6 py-2 sm:py-3 text-black rounded-xl transition-all hover:scale-[1.02] shadow-lg disabled:hover:scale-100 text-sm sm:text-base"
               >
                 {isSubmitting ? 'Submitting...' : existingResponse ? 'Update Response' : 'Submit Form'}
               </button>
@@ -406,5 +380,5 @@ export function FormView({ form }) {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
