@@ -10,6 +10,7 @@ export function FormView({ form }) {
   const [submitError, setSubmitError] = useState('')
   const [answers, setAnswers] = useState({})
   const formColor = form.color || '#9333EA'
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const formatDescription = (text) => {
     if (!text) return '';
     return text.split('\n').map((line, i) => (
@@ -23,19 +24,20 @@ export function FormView({ form }) {
   const isValidEmail = session?.user?.email?.endsWith('@citchennai.net')
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setSubmitError('')
+    e.preventDefault();
+    setSubmitError('');
 
     if (!session?.user?.email) {
-      await signIn('google')
-      return
+      await signIn('google');
+      return;
     }
 
     if (!isValidEmail) {
-      setSubmitError('Please use a college email address')
-      return
+      setSubmitError('Please use a college email address');
+      return;
     }
 
+    setIsSubmitting(true);
     try {
       const response = await fetch(`/api/forms/${form.id}/responses`, {
         method: 'POST',
@@ -47,23 +49,25 @@ export function FormView({ form }) {
             value,
           })),
         }),
-      })
+      });
 
       if (response.ok) {
-        router.push(`/forms/${form.id}/success`)
+        router.push(`/forms/${form.id}/success`);
       } else {
-        const data = await response.json()
+        const data = await response.json();
         if (response.status === 400) {
-          setSubmitError('You have already filled the form')
+          setSubmitError('You have already filled the form');
         } else {
-          setSubmitError(data.error || 'An error occurred while submitting the form')
+          setSubmitError(data.error || 'An error occurred while submitting the form');
         }
       }
     } catch (error) {
-      console.error('Error submitting form:', error)
-      setSubmitError('An error occurred while submitting the form')
+      console.error('Error submitting form:', error);
+      setSubmitError('An error occurred while submitting the form');
+    } finally {
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleSwitchAccount = async () => {
     await signOut({ redirect: false })
@@ -76,7 +80,7 @@ export function FormView({ form }) {
       backgroundColor: formColor,
       opacity: 0.9
     }
-  } 
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
@@ -302,18 +306,18 @@ export function FormView({ form }) {
 
               <button
                 type="submit"
-                disabled={!session || !isValidEmail}
+                disabled={isSubmitting || !session || !isValidEmail}
                 style={{
                   ...buttonStyle,
                   ':disabled': {
                     opacity: 0.5,
                     transform: 'scale(1)',
-                    backgroundColor: formColor
-                  }
+                    backgroundColor: formColor,
+                  },
                 }}
                 className="w-full px-6 py-3 text-black rounded-xl transition-all hover:scale-[1.02] shadow-lg disabled:hover:scale-100"
               >
-                Submit Form
+                {isSubmitting ? 'Submitting...' : 'Submit Form'}
               </button>
             </form>
           </>

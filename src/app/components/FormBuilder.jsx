@@ -216,7 +216,7 @@ export function FormBuilder() {
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
           <form onSubmit={handleSubmit} className="space-y-6">
-          <input
+            <input
               type="text"
               required
               value={title}
@@ -276,6 +276,7 @@ export function FormBuilder() {
                     alt="Question image"
                     fill
                     className="object-contain rounded-lg"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                   <button
                     onClick={() => updateQuestion(question.id, { imageUrl: '' })}
