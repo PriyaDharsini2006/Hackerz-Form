@@ -10,6 +10,15 @@ export function FormView({ form }) {
   const [submitError, setSubmitError] = useState('')
   const [answers, setAnswers] = useState({})
   const formColor = form.color || '#9333EA'
+  const formatDescription = (text) => {
+    if (!text) return '';
+    return text.split('\n').map((line, i) => (
+      <span key={i}>
+        {line}
+        {i !== text.split('\n').length - 1 && <br />}
+      </span>
+    ));
+  };
 
   const isValidEmail = session?.user?.email?.endsWith('@citchennai.net')
 
@@ -110,7 +119,7 @@ export function FormView({ form }) {
           <>
             {form.description && (
               <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
-                <p className="text-gray-300">{form.description}</p>
+                <p className="text-gray-300">{formatDescription(form.description)}</p>
               </div>
             )}
 
