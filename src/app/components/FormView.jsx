@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { Link as LinkIcon } from 'lucide-react'
 import { signIn, useSession, signOut } from 'next-auth/react'
 
 export function FormView({ form }) {
@@ -54,17 +55,17 @@ export function FormView({ form }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError('');
-  
+
     if (!session?.user?.email) {
       await signIn('google');
       return;
     }
-  
+
     if (!isValidEmail) {
       setSubmitError('Please use a college email address');
       return;
     }
-  
+
     setIsSubmitting(true);
     try {
       const method = existingResponse ? 'PUT' : 'POST';
@@ -79,7 +80,7 @@ export function FormView({ form }) {
           })),
         }),
       });
-  
+
       if (response.ok) {
         router.push(`/forms/${form.id}/success`);
       } else {
@@ -123,7 +124,7 @@ export function FormView({ form }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      {/* Header section remains the same */}
+      
       <div className="relative w-full h-25 from-gray-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
           <Image
@@ -133,7 +134,7 @@ export function FormView({ form }) {
             height={40}
             className="object-contain mt-[-10px]"
           />
-          <p className="text-white text-6xl font-hacked">Hackerz <span className="text-[#00f5d0]">Form</span></p>
+          <p className="text-white text-6xl font-hacked">Hackerz <span className="text-[#00f5d0]">Forms</span></p>
           <Image
             src="/logo1.png"
             alt="Right Logo"
@@ -178,7 +179,6 @@ export function FormView({ form }) {
               </div>
             )}
 
-            {/* Email section remains the same */}
             <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
               <div className="flex items-center justify-between">
                 <div>
@@ -254,6 +254,21 @@ export function FormView({ form }) {
                           fill
                           className="object-contain rounded-lg"
                         />
+                      </div>
+                    )}
+
+                    {question.link && (
+                      <div className="mb-4 flex">
+                        <LinkIcon size={16} className="text-purple-400 mt-[5px]" />
+                        <a
+                          href={question.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 ml-[5px] hover:text-blue-300 underline break-all"
+                          style={{ color: formColor }}
+                        >
+                          {question.link}
+                        </a>
                       </div>
                     )}
 
@@ -389,11 +404,6 @@ export function FormView({ form }) {
             </form>
           </>
         )}
-        <div className="mt-[10px]">
-          <a className="bg-red-500 mt-[10px] text-white px-4 py-2 rounded hover:bg-red-600" href="/">
-            Back
-          </a>
-        </div>
       </div>
     </div>
   )

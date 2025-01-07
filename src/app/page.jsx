@@ -8,7 +8,7 @@ import { revalidatePath } from 'next/cache'
 
 async function deleteForm(formId) {
   'use server'
-  
+
   try {
     await prisma.form.delete({
       where: { id: formId }
@@ -70,8 +70,26 @@ export default async function Home() {
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-        {/* Header and banner sections remain the same */}
-        
+        <div className="relative w-full h-25 from-gray-900 to-gray-800">
+          <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
+            <Image
+              src="/logo2.png"
+              alt="Left Logo"
+              width={120}
+              height={40}
+              className="object-contain mt-[-10px]"
+            />
+            <p className="text-white text-6xl font-hacked">Hackerz <span className="text-[#00f5d0]">Forms</span></p>
+            <Image
+              src="/logo1.png"
+              alt="Right Logo"
+              width={120}
+              height={40}
+              className="object-contain mt-[8px]"
+            />
+          </div>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <h2 className="text-xl font-semibold text-white">Your Forms</h2>

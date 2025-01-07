@@ -149,7 +149,6 @@ export async function PUT(request, { params }) {
     const body = await request.json()
     const { email, answers } = body
 
-    // First, find the existing response with answers
     const existingResponse = await prisma.response.findUnique({
       where: {
         formId_email: {
@@ -160,7 +159,7 @@ export async function PUT(request, { params }) {
       include: {
         answers: {
           include: {
-            question: true // Include question details for better context
+            question: true
           }
         },
       },
@@ -173,22 +172,17 @@ export async function PUT(request, { params }) {
       )
     }
 
-    // Format previous answers for comparison
     const previousAnswers = existingResponse.answers.map(answer => ({
       questionId: answer.questionId,
       questionTitle: answer.question.title,
       previousValue: answer.value,
       newValue: answers.find(a => a.questionId === answer.questionId)?.value || null
     }))
-
-    // Delete existing answers
     await prisma.answer.deleteMany({
       where: {
         responseId: existingResponse.id,
       },
     })
-
-    // Update response with new answers
     const updatedResponse = await prisma.response.update({
       where: {
         id: existingResponse.id,
@@ -210,7 +204,6 @@ export async function PUT(request, { params }) {
       },
     })
 
-    // Return both previous and updated responses
     return NextResponse.json({
       previousResponse: {
         email: existingResponse.email,

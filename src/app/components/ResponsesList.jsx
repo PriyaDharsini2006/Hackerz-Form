@@ -13,7 +13,7 @@ export function ResponsesList({ form }) {
             height={40}
             className="object-contain mt-[-10px]"
           />
-          <p className='text-white text-6xl font-hacked'>Hackerz <span className='text-[#00f5d0]'>Form</span></p>
+          <p className='text-white text-6xl font-hacked'>Hackerz <span className='text-[#00f5d0]'>Forms</span></p>
           <Image
             src="/logo1.png"
             alt="Right Logo"

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { link } from 'fs'
 
 export async function GET(request) {
   try {
@@ -26,7 +27,7 @@ export async function POST(request) {
   try {
     const { title, description, color, questions } = await request.json()
     
-    console.log('Received questions:', questions); // Add this debug log
+    console.log('Received questions:', questions);
 
     const form = await prisma.form.create({
       data: {
@@ -35,7 +36,7 @@ export async function POST(request) {
         color, 
         questions: {
           create: questions.map((q, index) => {
-            console.log('Creating question with imageUrl:', q.imageUrl); // Add this debug log
+            console.log('Creating question with imageUrl:', q.imageUrl);
             return {
               type: q.type,
               title: q.title,
@@ -43,6 +44,7 @@ export async function POST(request) {
               required: q.required,
               order: index,
               imageUrl: q.imageUrl || '',
+              link: q.link || '',
             };
           }),
         },
@@ -56,7 +58,8 @@ export async function POST(request) {
             options: true,
             required: true,
             order: true,
-            imageUrl: true, // Make sure this is included
+            imageUrl: true,
+            link: true,
           }
         },
       },

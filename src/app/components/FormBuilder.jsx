@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Plus, X, Trash2, ChevronDown } from 'lucide-react'
+import { Plus, X, Trash2, ChevronDown, Link as LinkIcon } from 'lucide-react'
 
 export function FormBuilder() {
   const router = useRouter()
@@ -34,6 +34,7 @@ export function FormBuilder() {
         required: false,
         order: questions.length,
         imageUrl: '',
+        link: '',
       },
     ])
     setIsDropdownOpen(false)
@@ -79,12 +80,12 @@ export function FormBuilder() {
 
   const handleImageUpload = async (id, file) => {
     if (!file) return;
-  
+
     try {
       const reader = new FileReader();
       reader.onload = async () => {
         const base64Data = reader.result;
-  
+
         const response = await fetch('/api/upload', {
           method: 'POST',
           headers: {
@@ -94,16 +95,16 @@ export function FormBuilder() {
             image: base64Data,
           }),
         });
-  
+
         if (!response.ok) {
           throw new Error('Upload failed');
         }
-  
+
         const { url } = await response.json();
         console.log('Received image URL:', url);
-        setQuestions(prevQuestions => 
-          prevQuestions.map(q => 
-            q.id === id 
+        setQuestions(prevQuestions =>
+          prevQuestions.map(q =>
+            q.id === id
               ? { ...q, imageUrl: url }
               : q
           )
@@ -115,7 +116,7 @@ export function FormBuilder() {
       alert('Failed to upload image. Please try again.');
     }
   };
-  
+
 
   const updateQuestion = (id, updates) => {
     setQuestions(
@@ -127,25 +128,25 @@ export function FormBuilder() {
     setQuestions(questions.filter((q) => q.id !== id))
   }
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!title.trim()) {
       alert('Please enter a form title');
       return;
     }
-  
+
     if (questions.length === 0) {
       alert('Please add at least one question');
       return;
     }
-  
+
     const invalidQuestions = questions.filter(q => !q.title.trim());
     if (invalidQuestions.length > 0) {
       alert('Please fill in all question titles');
       return;
     }
-  
+
     const invalidOptionQuestions = questions.filter(q =>
       (q.type === 'multiple' || q.type === 'dropdown' || q.type === 'checkbox') &&
       q.options.length === 0
@@ -154,16 +155,16 @@ const handleSubmit = async (e) => {
       alert('Please add at least one option for all choice-based questions');
       return;
     }
-  
+
     setIsSubmitting(true);
-  
+
     try {
       const formData = {
         title,
         description,
         color,
         questions: questions.map((q, index) => {
-          console.log('Question image URL:', q.imageUrl); // Add this line
+          console.log('Question image URL:', q.imageUrl);
           return {
             type: q.type,
             title: q.title.trim(),
@@ -171,22 +172,23 @@ const handleSubmit = async (e) => {
             required: q.required,
             order: index,
             imageUrl: q.imageUrl || '',
+            link: q.link || '',
           };
         }),
       };
-      
-  
+
+
       const response = await fetch('/api/forms', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || 'Failed to create form');
       }
-  
+
       const data = await response.json();
       router.push(`/forms/${data.id}`);
     } catch (error) {
@@ -207,7 +209,7 @@ const handleSubmit = async (e) => {
             height={40}
             className="object-contain mt-[-10px]"
           />
-          <p className='text-white text-6xl font-hacked'>Hackerz <span className='text-[#00f5d0]'>Form</span></p>
+          <p className='text-white text-6xl font-hacked'>Hackerz <span className='text-[#00f5d0]'>Forms</span></p>
           <Image
             src="/logo1.png"
             alt="Right Logo"
@@ -280,6 +282,19 @@ const handleSubmit = async (e) => {
               >
                 <Trash2 size={20} />
               </button>
+            </div>
+
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-2 flex-1">
+                <LinkIcon size={16} className="text-purple-400" />
+                <input
+                  type="url"
+                  value={question.link || ''}
+                  onChange={(e) => updateQuestion(question.id, { link: e.target.value })}
+                  className="flex-1 bg-gray-900/50 text-white border-b-2 border-purple-500 px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400 transition-colors"
+                  placeholder="Add optional link (https://...)"
+                />
+              </div>
             </div>
 
             <div className="mb-4">

@@ -32,7 +32,8 @@ export async function PUT(
                             options: question.options || [],
                             required: question.required,
                             order: index,
-                            imageUrl: question.imageUrl || ''
+                            imageUrl: question.imageUrl || '',
+                            link: question.link || '',
                         },
                         update: {
                             type: question.type,
@@ -40,7 +41,8 @@ export async function PUT(
                             options: question.options || [],
                             required: question.required,
                             order: index,
-                            imageUrl: question.imageUrl || ''
+                            imageUrl: question.imageUrl || '',
+                            link: question.link || '',
                         }
                     }))
                 }

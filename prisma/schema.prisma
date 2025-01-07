@@ -34,6 +34,7 @@ model Question {
   required Boolean  @default(false)
   order    Int
   imageUrl String?
+  link     String?
   answers  Answer[]
   form     Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
 }

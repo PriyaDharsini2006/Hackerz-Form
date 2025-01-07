@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Pencil, Plus, Trash2, Save, X, Upload, GripVertical } from 'lucide-react'
+import { Pencil, Plus, Trash2, Save, X, GripVertical, Link as LinkIcon } from 'lucide-react'
 
 export function Preview({ form: initialForm }) {
   const router = useRouter()
@@ -191,7 +191,7 @@ export function Preview({ form: initialForm }) {
             height={40}
             className="object-contain mt-[-10px]"
           />
-          <p className='text-white text-6xl font-hacked'>Hackerz <span style={{ color: form.color }}>Form</span></p>
+          <p className='text-white text-6xl font-hacked'>Hackerz <span style={{ color: form.color }}>Forms</span></p>
           <div className="flex items-center gap-4">
             <Image
               src="/logo1.png"
@@ -293,6 +293,28 @@ export function Preview({ form: initialForm }) {
                       </button>
                     </div>
 
+                    <div className="flex items-center gap-2">
+                      <LinkIcon size={20} className="text-gray-400" />
+                      <input
+                        type="url"
+                        value={question.link || ''}
+                        onChange={(e) =>
+                          updateQuestion(question.id, { link: e.target.value })
+                        }
+                        className="flex-1 bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
+                        style={{ borderBottom: `2px solid ${form.color}` }}
+                        placeholder="Add a link (optional)"
+                      />
+                      {question.link && (
+                        <button
+                          onClick={() => updateQuestion(question.id, { link: '' })}
+                          className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                        >
+                          <X size={20} />
+                        </button>
+                      )}
+                    </div>
+
                     <div className="flex gap-4">
                       <select
                         value={question.type}
@@ -391,6 +413,7 @@ export function Preview({ form: initialForm }) {
                           </button>
                         </div>
                       )}
+
                     </div>
 
                   </div>
@@ -410,6 +433,21 @@ export function Preview({ form: initialForm }) {
                           className="object-contain rounded-lg"
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
+                      </div>
+                    )}
+
+                    {question.link && (
+                      <div className="mt-2">
+                        <a
+                          href={question.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline break-all flex items-center gap-2"
+                          style={{ color: form.color }}
+                        >
+                          <LinkIcon size={16} />
+                          {question.link}
+                        </a>
                       </div>
                     )}
                   </div>
