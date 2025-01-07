@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { Plus, Eye, LineChart, Play, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { revalidatePath } from 'next/cache'
+import DeleteFormDialog from '@/lib/DeleteFormDialog';
 
 async function deleteForm(formId) {
   'use server'
@@ -133,15 +134,11 @@ export default async function Home() {
                     <Play size={14} className="sm:size-[16px]" />
                     <span>Preview</span>
                   </Link>
-                  <form action={deleteForm.bind(null, form.id)}>
-                    <button
-                      type="submit"
-                      className="flex items-center gap-1 sm:gap-2 text-red-400 hover:text-red-300 transition-colors text-sm"
-                    >
-                      <Trash2 size={14} className="sm:size-[16px]" />
-                      <span>Delete</span>
-                    </button>
-                  </form>
+                  <DeleteFormDialog
+                    formId={form.id}
+                    formTitle={form.title}
+                    deleteForm={deleteForm}
+                  />
                 </div>
               </div>
             ))}

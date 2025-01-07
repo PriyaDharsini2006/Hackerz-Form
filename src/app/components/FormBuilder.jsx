@@ -289,18 +289,7 @@ export function FormBuilder() {
               </button>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
-              <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
-                <LinkIcon size={16} className="text-purple-400 shrink-0" />
-                <input
-                  type="url"
-                  value={question.link || ''}
-                  onChange={(e) => updateQuestion(question.id, { link: e.target.value })}
-                  className="w-full bg-gray-900/50 text-white border-b-2 border-purple-500 px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400 transition-colors"
-                  placeholder="Add optional link (https://...)"
-                />
-              </div>
-            </div>
+            
 
             <div className="mb-4">
               <input

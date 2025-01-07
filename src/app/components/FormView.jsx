@@ -268,20 +268,6 @@ export function FormView({ form }) {
                       </div>
                     )}
 
-                    {question.link && (
-                      <div className="mb-4 flex flex-wrap">
-                        <LinkIcon size={16} className="text-purple-400 mt-[5px]" />
-                        <a
-                          href={question.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 ml-[5px] hover:text-blue-300 underline break-all text-sm sm:text-base"
-                          style={{ color: formColor }}
-                        >
-                          {question.link}
-                        </a>
-                      </div>
-                    )}
 
                     {question.type === 'short' && (
                       <input

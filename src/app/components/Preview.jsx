@@ -307,28 +307,6 @@ export function Preview({ form: initialForm }) {
                       </button>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <LinkIcon size={20} className="text-gray-400" />
-                      <input
-                        type="url"
-                        value={question.link || ''}
-                        onChange={(e) =>
-                          updateQuestion(question.id, { link: e.target.value })
-                        }
-                        className="flex-1 bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
-                        style={{ borderBottom: `2px solid ${form.color}` }}
-                        placeholder="Add a link (optional)"
-                      />
-                      {question.link && (
-                        <button
-                          onClick={() => updateQuestion(question.id, { link: '' })}
-                          className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                        >
-                          <X size={20} />
-                        </button>
-                      )}
-                    </div>
-
                     <div className="flex gap-4">
                       <select
                         value={question.type}
