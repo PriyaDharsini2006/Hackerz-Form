@@ -14,6 +14,7 @@ export function FormBuilder() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [color, setColor] = useState('#9333EA')
   const dropdownRef = useRef(null)
+  const [formLink, setFormLink] = useState('')
 
   const questionTypes = [
     { type: 'short', label: 'Short Answer' },
@@ -163,8 +164,8 @@ export function FormBuilder() {
         title,
         description,
         color,
+        link: formLink,
         questions: questions.map((q, index) => {
-          console.log('Question image URL:', q.imageUrl);
           return {
             type: q.type,
             title: q.title.trim(),
@@ -176,7 +177,6 @@ export function FormBuilder() {
           };
         }),
       };
-
 
       const response = await fetch('/api/forms', {
         method: 'POST',
@@ -247,6 +247,17 @@ export function FormBuilder() {
               className="w-full bg-gray-900/50 text-gray-300 border-b-2 border-purple-500 px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400 transition-colors whitespace-pre-wrap min-h-[100px] resize-y"
               placeholder="Form Description"
             />
+
+            <div className="flex items-center gap-2 w-full">
+              <LinkIcon size={16} className="text-purple-400 shrink-0" />
+              <input
+                type="url"
+                value={formLink}
+                onChange={(e) => setFormLink(e.target.value)}
+                className="w-full bg-gray-900/50 text-white border-b-2 border-purple-500 px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400 transition-colors"
+                placeholder="Add optional form link (https://...)"
+              />
+            </div>
 
             <div className="flex flex-wrap items-center gap-4">
               <label className="text-gray-300">Form Color:</label>

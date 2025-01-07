@@ -8,7 +8,7 @@ export async function PUT(
     try {
         const { formId } = params
         const body = await req.json()
-        const { title, description, questions, color, isActive } = body
+        const { title, description, questions, color, isActive, link } = body
 
         const updatedForm = await prisma.form.update({
             where: { id: formId },
@@ -17,6 +17,7 @@ export async function PUT(
                 description,
                 color,
                 isActive,
+                link,
                 questions: {
                     deleteMany: {
                         formId,

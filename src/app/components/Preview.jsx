@@ -72,7 +72,8 @@ export function Preview({ form: initialForm }) {
           description: form.description,
           questions: form.questions,
           color: form.color,
-          isActive: form.isActive
+          isActive: form.isActive,
+          link: form.link
         }),
       })
 
@@ -98,10 +99,10 @@ export function Preview({ form: initialForm }) {
     try {
       const reader = new FileReader()
       reader.readAsDataURL(file)
-      
+
       reader.onloadend = async () => {
         const base64String = reader.result
-        
+
         const response = await fetch('/api/upload', {
           method: 'POST',
           headers: {

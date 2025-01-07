@@ -179,6 +179,21 @@ export function FormView({ form }) {
               </div>
             )}
 
+            {form.link && (
+              <div className="flex items-center gap-2">
+                <LinkIcon size={16} className="text-purple-400" />
+                <a
+                  href={form.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 underline break-all text-sm sm:text-base"
+                  style={{ color: formColor }}
+                >
+                  {form.link}
+                </a>
+              </div>
+            )}
+
             <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-4 sm:p-6 border border-gray-700/50">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>

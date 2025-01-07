@@ -16,6 +16,7 @@ model Form {
   id          String     @id @default(cuid())
   title       String
   description String?
+  link        String?
   color       String     @default("#9333EA") 
   isActive    Boolean    @default(true)
   createdAt   DateTime   @default(now())

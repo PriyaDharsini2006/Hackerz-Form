@@ -25,7 +25,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { title, description, color, questions } = await request.json()
+    const { title, description, color, questions, link } = await request.json()
     
     console.log('Received questions:', questions);
 
@@ -34,6 +34,7 @@ export async function POST(request) {
         title,
         description,
         color, 
+        link,
         questions: {
           create: questions.map((q, index) => {
             console.log('Creating question with imageUrl:', q.imageUrl);
