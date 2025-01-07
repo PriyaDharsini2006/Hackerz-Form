@@ -11,6 +11,15 @@ export function Preview({ form: initialForm }) {
   const [email, setEmail] = useState('')
   const [answers, setAnswers] = useState({})
   const [isSaving, setIsSaving] = useState(false)
+  const formatDescription = (text) => {
+    if (!text) return '';
+    return text.split('\n').map((line, i) => (
+      <span key={i}>
+        {line}
+        {i !== text.split('\n').length - 1 && <br />}
+      </span>
+    ));
+  };
 
   const handleSaveForm = async () => {
     try {
@@ -174,15 +183,16 @@ export function Preview({ form: initialForm }) {
               <textarea
                 value={form.description || ''}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
+                className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors min-h-[100px] resize-y"
                 style={{ borderBottom: `2px solid ${form.color}` }}
                 placeholder="Form description"
-                rows={3}
               />
             )}
 
             {!isEditing && form.description && (
-              <p className="text-gray-300">{form.description}</p>
+              <div className="text-gray-300">
+                {formatDescription(form.description)}
+              </div>
             )}
 
             {!isEditing && (

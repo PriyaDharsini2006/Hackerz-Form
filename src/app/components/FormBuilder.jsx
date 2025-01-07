@@ -216,7 +216,7 @@ export function FormBuilder() {
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <input
+          <input
               type="text"
               required
               value={title}
@@ -228,8 +228,7 @@ export function FormBuilder() {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-gray-900/50 text-gray-300 border-b-2 border-purple-500 px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400 transition-colors"
-              rows={2}
+              className="w-full bg-gray-900/50 text-gray-300 border-b-2 border-purple-500 px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400 transition-colors whitespace-pre-wrap min-h-[100px] resize-y"
               placeholder="Form Description"
             />
 
