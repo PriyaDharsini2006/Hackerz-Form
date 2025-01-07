@@ -223,17 +223,6 @@ export function Preview({ form: initialForm }) {
           </div>
         )}
 
-        {isEditing && (
-          <button
-            onClick={addNewQuestion}
-            className="w-full p-4 border-2 border-dashed rounded-xl hover:bg-opacity-10 transition-colors flex items-center justify-center gap-2"
-            style={{ borderColor: form.color, color: form.color }}
-          >
-            <Plus size={20} />
-            Add New Question
-          </button>
-        )}
-
         <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
           <div className="space-y-6">
             {isEditing && (
@@ -522,6 +511,18 @@ export function Preview({ form: initialForm }) {
                 )}
               </div>
             ))}
+
+            {isEditing && (
+              <button
+                onClick={addNewQuestion}
+                className="w-full p-4 border-2 border-dashed rounded-xl hover:bg-opacity-10 transition-colors flex items-center justify-center gap-2"
+                style={{ borderColor: form.color, color: form.color }}
+              >
+                <Plus size={20} />
+                Add New Question
+              </button>
+            )}
+
           </div>
 
           <div className="flex gap-4 mt-6">
