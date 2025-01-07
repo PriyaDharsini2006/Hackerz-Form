@@ -96,19 +96,32 @@ export function Preview({ form: initialForm }) {
     if (!file) return
 
     try {
-      const formData = new FormData()
-      formData.append('file', file)
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      
+      reader.onloadend = async () => {
+        const base64String = reader.result
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            image: base64String
+          }),
+        })
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
+        if (response.ok) {
+          const { url } = await response.json()
+          updateQuestion(id, { imageUrl: url })
+        } else {
+          throw new Error('Upload failed')
+        }
+      }
 
-      if (response.ok) {
-        const { url } = await response.json()
-        updateQuestion(id, { imageUrl: url })
-      } else {
-        throw new Error('Upload failed')
+      reader.onerror = () => {
+        throw new Error('Failed to read file')
       }
     } catch (error) {
       console.error('Error uploading image:', error)
@@ -182,8 +195,7 @@ export function Preview({ form: initialForm }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      {/* Header Section - Responsive */}
-      <div className="w-full py-4 sm:py-6 from-gray-900 to-gray-800">
+      <div className="relative w-full h-25 from-gray-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
           <Image
             src="/logo2.png"
@@ -192,19 +204,22 @@ export function Preview({ form: initialForm }) {
             height={40}
             className="object-contain mt-[-10px]"
           />
-          <p className='text-white text-4xl sm:text-6xl font-hacked'>Hackerz <span className='text-purple-500'>Forms</span></p>
-          <Image
-            src="/logo1.png"
-            alt="Right Logo"
-            width={120}
-            height={40}
-            className="object-contain mt-[8px]"
-          />
+          <p className='text-white text-6xl font-hacked'>Hackerz <span style={{ color: form.color }}>Forms</span></p>
+          <div className="flex items-center gap-4">
+            <Image
+              src="/logo1.png"
+              alt="Right Logo"
+              width={120}
+              height={40}
+              className="object-contain mt-[8px]"
+            />
+          </div>
         </div>
       </div>
-      <div className="max-w-4xl mx-auto px-4 py-4 sm:py-8 space-y-4 sm:space-y-6">
+
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         {isEditing && (
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-4">
+          <div className="flex gap-4 items-center mb-4">
             <input
               type="color"
               value={form.color}
@@ -213,7 +228,7 @@ export function Preview({ form: initialForm }) {
             />
             <button
               onClick={toggleFormActive}
-              className={`w-full sm:w-auto px-4 py-2 rounded ${form.isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
+              className={`px-4 py-2 rounded ${form.isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
                 } text-white transition-colors`}
             >
               {form.isActive ? 'Deactivate' : 'Activate'}
@@ -221,20 +236,26 @@ export function Preview({ form: initialForm }) {
           </div>
         )}
 
-        <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-4 sm:p-6 border border-gray-700/50">
-          <div className="space-y-4 sm:space-y-6">
+        <div className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50">
+          <div className="space-y-6">
             {isEditing && (
               <textarea
                 value={form.description || ''}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors min-h-[100px] resize-y text-sm sm:text-base"
+                className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors min-h-[100px] resize-y"
                 style={{ borderBottom: `2px solid ${form.color}` }}
                 placeholder="Form description"
               />
             )}
 
+            {!isEditing && form.description && (
+              <div className="text-gray-300">
+                {formatDescription(form.description)}
+              </div>
+            )}
+
             {!isEditing && (
-              <div className="space-y-1">
+              <div>
                 <label className="block text-sm font-medium text-gray-300">
                   Email Address
                 </label>
@@ -243,7 +264,7 @@ export function Preview({ form: initialForm }) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 block w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors text-sm sm:text-base"
+                  className="mt-1 block w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
                   style={{ borderBottom: `2px solid ${form.color}` }}
                   placeholder="Enter your email"
                 />
@@ -258,36 +279,62 @@ export function Preview({ form: initialForm }) {
                 onDragEnd={handleDragEnd}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, question.id)}
-                className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-4 sm:p-6 border border-gray-700/50 transition-all hover:border-opacity-50"
+                className="bg-white/5 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-gray-700/50 transition-all hover:border-opacity-50"
                 style={{ borderColor: form.color }}
               >
                 {isEditing ? (
                   <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <div className="flex items-center gap-2 mb-4">
                       <div className="cursor-move">
                         <GripVertical size={20} className="text-gray-400" />
                       </div>
                       <input
                         type="text"
                         value={question.title}
-                        onChange={(e) => updateQuestion(question.id, { title: e.target.value })}
-                        className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors text-sm sm:text-base"
+                        onChange={(e) =>
+                          updateQuestion(question.id, { title: e.target.value })
+                        }
+                        className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
                         style={{ borderBottom: `2px solid ${form.color}` }}
                         placeholder="Question title"
                       />
                       <button
                         onClick={() => deleteQuestion(question.id)}
-                        className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                        className="ml-2 p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
                       >
                         <Trash2 size={20} />
                       </button>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex items-center gap-2">
+                      <LinkIcon size={20} className="text-gray-400" />
+                      <input
+                        type="url"
+                        value={question.link || ''}
+                        onChange={(e) =>
+                          updateQuestion(question.id, { link: e.target.value })
+                        }
+                        className="flex-1 bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
+                        style={{ borderBottom: `2px solid ${form.color}` }}
+                        placeholder="Add a link (optional)"
+                      />
+                      {question.link && (
+                        <button
+                          onClick={() => updateQuestion(question.id, { link: '' })}
+                          className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                        >
+                          <X size={20} />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex gap-4">
                       <select
                         value={question.type}
-                        onChange={(e) => updateQuestion(question.id, { type: e.target.value })}
-                        className="w-full sm:w-auto bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors text-sm sm:text-base"
+                        onChange={(e) =>
+                          updateQuestion(question.id, { type: e.target.value })
+                        }
+                        className="bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
                         style={{ borderBottom: `2px solid ${form.color}` }}
                       >
                         <option value="short">Short Answer</option>
@@ -301,7 +348,9 @@ export function Preview({ form: initialForm }) {
                         <input
                           type="checkbox"
                           checked={question.required}
-                          onChange={(e) => updateQuestion(question.id, { required: e.target.checked })}
+                          onChange={(e) =>
+                            updateQuestion(question.id, { required: e.target.checked })
+                          }
                           className="w-4 h-4 rounded border-2 text-purple-500 focus:ring-offset-gray-800"
                           style={{ borderColor: form.color }}
                         />
@@ -309,62 +358,124 @@ export function Preview({ form: initialForm }) {
                       </label>
                     </div>
 
-                    {(question.type === 'multiple' || question.type === 'checkbox' || question.type === 'dropdown') && (
-                      <div className="space-y-2">
-                        {question.options.map((option, optionIndex) => (
-                          <div key={optionIndex} className="flex gap-2">
-                            <input
-                              type="text"
-                              value={option}
-                              onChange={(e) => {
-                                const newOptions = [...question.options];
-                                newOptions[optionIndex] = e.target.value;
-                                updateQuestion(question.id, { options: newOptions });
-                              }}
-                              className="flex-1 bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors text-sm sm:text-base"
-                              style={{ borderBottom: `2px solid ${form.color}` }}
-                              placeholder={`Option ${optionIndex + 1}`}
-                            />
-                            <button
-                              onClick={() => {
-                                const newOptions = question.options.filter((_, i) => i !== optionIndex);
-                                updateQuestion(question.id, { options: newOptions });
-                              }}
-                              className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                            >
-                              <Trash2 size={20} />
-                            </button>
-                          </div>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newOptions = [...question.options, ''];
-                            updateQuestion(question.id, { options: newOptions });
-                          }}
-                          className="text-sm sm:text-base transition-colors"
-                          style={{ color: form.color }}
-                        >
-                          + Add Option
-                        </button>
-                      </div>
-                    )}
+                    {(question.type === 'multiple' ||
+                      question.type === 'checkbox' ||
+                      question.type === 'dropdown') && (
+                        <div className="space-y-2">
+                          {question.options.map((option, optionIndex) => (
+                            <div key={optionIndex} className="flex gap-2">
+                              <input
+                                type="text"
+                                value={option}
+                                onChange={(e) => {
+                                  const newOptions = [...question.options]
+                                  newOptions[optionIndex] = e.target.value
+                                  updateQuestion(question.id, { options: newOptions })
+                                }}
+                                className="flex-1 bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
+                                style={{ borderBottom: `2px solid ${form.color}` }}
+                                placeholder={`Option ${optionIndex + 1}`}
+                              />
+                              <button
+                                onClick={() => {
+                                  const newOptions = question.options.filter(
+                                    (_, i) => i !== optionIndex
+                                  )
+                                  updateQuestion(question.id, { options: newOptions })
+                                }}
+                                className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                              >
+                                <Trash2 size={20} />
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newOptions = [...question.options, '']
+                              updateQuestion(question.id, { options: newOptions })
+                            }}
+                            className="transition-colors"
+                            style={{ color: form.color }}
+                          >
+                            + Add Option
+                          </button>
+                        </div>
+                      )}
+
+                    <div className="mb-4">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(question.id, e.target.files[0])}
+                        className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-900 file:text-purple-300 hover:file:bg-purple-800 transition-colors"
+                      />
+                      {question.imageUrl && (
+                        <div className="mt-2 relative h-40 w-full">
+                          <Image
+                            src={question.imageUrl}
+                            alt="Question image"
+                            fill
+                            className="object-contain rounded-lg"
+                          />
+                          <button
+                            onClick={() => updateQuestion(question.id, { imageUrl: '' })}
+                            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      )}
+
+                    </div>
+
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {/* Question Display */}
-                    <label className="block text-sm sm:text-base font-medium text-gray-300">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-300">
                       {question.title}
                       {question.required && <span className="text-red-400 ml-1">*</span>}
                     </label>
 
-                    {/* Answer Input Fields */}
+                    {question.imageUrl && (
+                      <div className="mt-4 relative h-40 w-full">
+                        <Image
+                          src={question.imageUrl}
+                          alt={question.title}
+                          fill
+                          className="object-contain rounded-lg"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
+                    )}
+
+                    {question.link && (
+                      <div className="mt-2">
+                        <a
+                          href={question.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline break-all flex items-center gap-2"
+                          style={{ color: form.color }}
+                        >
+                          <LinkIcon size={16} />
+                          {question.link}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!isEditing && (
+                  <>
                     {question.type === 'short' && (
                       <input
                         type="text"
                         required={question.required}
-                        onChange={(e) => setAnswers({ ...answers, [question.id]: e.target.value })}
-                        className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors text-sm sm:text-base"
+                        onChange={(e) =>
+                          setAnswers({ ...answers, [question.id]: e.target.value })
+                        }
+                        className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
                         style={{ borderBottom: `2px solid ${form.color}` }}
                         placeholder="Your answer"
                       />
@@ -373,72 +484,105 @@ export function Preview({ form: initialForm }) {
                     {question.type === 'long' && (
                       <textarea
                         required={question.required}
-                        onChange={(e) => setAnswers({ ...answers, [question.id]: e.target.value })}
+                        onChange={(e) =>
+                          setAnswers({ ...answers, [question.id]: e.target.value })
+                        }
                         rows={4}
-                        className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors text-sm sm:text-base"
+                        className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
                         style={{ borderBottom: `2px solid ${form.color}` }}
                         placeholder="Your answer"
                       />
                     )}
 
-                    {/* Multiple Choice Options */}
-                    {(question.type === 'multiple' || question.type === 'checkbox') && (
-                      <div className="space-y-2">
+                    {question.type === 'multiple' && (
+                      <div className="mt-1 space-y-3">
                         {question.options.map((option) => (
                           <label key={option} className="flex items-center gap-2">
                             <input
-                              type={question.type === 'multiple' ? 'radio' : 'checkbox'}
+                              type="radio"
                               name={question.id}
                               value={option}
                               required={question.required}
-                              onChange={(e) => {
-                                if (question.type === 'multiple') {
-                                  setAnswers({ ...answers, [question.id]: e.target.value });
-                                } else {
-                                  const currentValues = answers[question.id]?.split(',') || [];
-                                  const newValues = e.target.checked
-                                    ? [...currentValues, option]
-                                    : currentValues.filter((v) => v !== option);
-                                  setAnswers({
-                                    ...answers,
-                                    [question.id]: newValues.join(','),
-                                  });
-                                }
-                              }}
-                              className="w-4 h-4 rounded border-2 focus:ring-offset-gray-800"
+                              onChange={(e) =>
+                                setAnswers({ ...answers, [question.id]: e.target.value })
+                              }
+                              className="w-4 h-4 border-2 focus:ring-offset-gray-800"
                               style={{ borderColor: form.color, color: form.color }}
                             />
-                            <span className="text-sm sm:text-base text-gray-300">{option}</span>
+                            <span className="text-gray-300">{option}</span>
                           </label>
                         ))}
                       </div>
                     )}
-                  </div>
+
+                    {question.type === 'dropdown' && (
+                      <select
+                        required={question.required}
+                        onChange={(e) =>
+                          setAnswers({ ...answers, [question.id]: e.target.value })
+                        }
+                        className="w-full bg-gray-900/50 text-white px-3 py-2 rounded-lg focus:outline-none transition-colors"
+                        style={{ borderBottom: `2px solid ${form.color}` }}
+                      >
+                        <option value="">Select an option</option>
+                        {question.options.map((option) => (
+                          <option key={option} value={option} className="bg-gray-800">
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
+                    {question.type === 'checkbox' && (
+                      <div className="mt-1 space-y-3">
+                        {question.options.map((option) => (
+                          <label key={option} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              value={option}
+                              onChange={(e) => {
+                                const currentValues = answers[question.id]?.split(',') || []
+                                const newValues = e.target.checked
+                                  ? [...currentValues, option]
+                                  : currentValues.filter((v) => v !== option)
+                                setAnswers({
+                                  ...answers,
+                                  [question.id]: newValues.join(','),
+                                })
+                              }}
+                              className="w-4 h-4 rounded border-2 focus:ring-offset-gray-800"
+                              style={{ borderColor: form.color, color: form.color }}
+                            />
+                            <span className="text-gray-300">{option}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             ))}
 
-            {/* Add Question Button */}
             {isEditing && (
               <button
                 onClick={addNewQuestion}
-                className="w-full p-4 border-2 border-dashed rounded-xl hover:bg-opacity-10 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+                className="w-full p-4 border-2 border-dashed rounded-xl hover:bg-opacity-10 transition-colors flex items-center justify-center gap-2"
                 style={{ borderColor: form.color, color: form.color }}
               >
                 <Plus size={20} />
                 Add New Question
               </button>
             )}
+
           </div>
 
-          {/* Form Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-6">
+          <div className="flex gap-4 mt-6">
             {isEditing ? (
               <>
                 <button
                   onClick={handleSaveForm}
                   disabled={isSaving}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-white rounded-lg transition-colors text-sm sm:text-base"
+                  className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
                   style={{ backgroundColor: form.color }}
                 >
                   <Save size={20} />
@@ -446,7 +590,7 @@ export function Preview({ form: initialForm }) {
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm sm:text-base"
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                 >
                   <X size={20} />
                   Cancel
@@ -455,7 +599,7 @@ export function Preview({ form: initialForm }) {
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-black rounded-lg transition-colors text-sm sm:text-base"
+                className="flex items-center gap-2 px-4 py-2 text-black rounded-lg transition-colors"
                 style={{ backgroundColor: form.color }}
               >
                 <Pencil size={20} />
@@ -465,10 +609,9 @@ export function Preview({ form: initialForm }) {
           </div>
         </div>
 
-        {/* Back Button */}
         <div className="mt-4">
           <a
-            className="inline-block w-full sm:w-auto text-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-sm sm:text-base"
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
             href="/"
           >
             Back
@@ -476,5 +619,5 @@ export function Preview({ form: initialForm }) {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
