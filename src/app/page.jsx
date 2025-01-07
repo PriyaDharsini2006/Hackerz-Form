@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { Plus, Eye, LineChart, Play, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { revalidatePath } from 'next/cache'
-import DeleteFormDialog from '@/lib/DeleteFormDialog';
+import DeleteFormDialog from '@/components/DeleteFormDialog';
 
 async function deleteForm(formId) {
   'use server'
