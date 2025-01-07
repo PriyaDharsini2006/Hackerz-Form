@@ -192,14 +192,7 @@ export function Preview({ form: initialForm }) {
             height={40}
             className="object-contain mt-[-10px]"
           />
-          <p
-            className={`text-white font-hacked items-center ${window.innerWidth < 640 ? 'text-4xl' : 'text-6xl'
-              }`}
-          >
-            Hackerz <span className='text-[#00f5d0]'>Forms</span>
-          </p>
-
-
+          <p className='text-white text-4xl sm:text-6xl font-hacked'>Hackerz <span className='text-purple-500'>Forms</span></p>
           <Image
             src="/logo1.png"
             alt="Right Logo"
@@ -209,7 +202,6 @@ export function Preview({ form: initialForm }) {
           />
         </div>
       </div>
-      {/* Main Content Section - Responsive */}
       <div className="max-w-4xl mx-auto px-4 py-4 sm:py-8 space-y-4 sm:space-y-6">
         {isEditing && (
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-4">

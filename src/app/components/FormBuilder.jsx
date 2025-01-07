@@ -210,14 +210,7 @@ export function FormBuilder() {
             height={40}
             className="object-contain mt-[-10px]"
           />
-          <p
-            className={`text-white font-hacked items-center ${window.innerWidth < 640 ? 'text-4xl' : 'text-6xl'
-              }`}
-          >
-            Hackerz <span className='text-[#00f5d0]'>Forms</span>
-          </p>
-
-
+          <p className='text-white text-4xl sm:text-6xl font-hacked'>Hackerz <span className='text-purple-500'>Forms</span></p>
           <Image
             src="/logo1.png"
             alt="Right Logo"
