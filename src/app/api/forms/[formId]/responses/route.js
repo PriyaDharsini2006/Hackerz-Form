@@ -59,7 +59,6 @@ export async function GET(request, { params }) {
       })
 
       try {
-        // Ensure tmp directory exists
         const tmpDir = path.join(process.cwd(), 'tmp')
         await mkdir(tmpDir, { recursive: true })
 
@@ -70,14 +69,9 @@ export async function GET(request, { params }) {
         })
 
         await csvWriter.writeRecords(records)
-
-        // Read the file
         const fileContent = await readFile(csvPath)
-
-        // Clean up the temporary file
         await unlink(csvPath).catch(console.error)
 
-        // Return the CSV with proper headers
         return new NextResponse(fileContent, {
           headers: {
             'Content-Type': 'text/csv; charset=utf-8',
@@ -93,7 +87,6 @@ export async function GET(request, { params }) {
       }
     }
 
-    // Return JSON response if CSV is not requested
     return NextResponse.json(form.responses)
   } catch (error) {
     console.error('Error fetching responses:', error)
@@ -109,7 +102,6 @@ export async function POST(request, { params }) {
     const body = await request.json()
     const { email, answers } = body
 
-    // Check if email already exists for this form
     const existingResponse = await prisma.response.findUnique({
       where: {
         formId_email: {
@@ -126,7 +118,6 @@ export async function POST(request, { params }) {
       )
     }
 
-    // Create response with answers
     const response = await prisma.response.create({
       data: {
         formId: params.formId,
@@ -148,6 +139,90 @@ export async function POST(request, { params }) {
     console.error('Error submitting response:', error)
     return NextResponse.json(
       { error: 'Error submitting response' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(request, { params }) {
+  try {
+    const body = await request.json()
+    const { email, answers } = body
+
+    // First, find the existing response with answers
+    const existingResponse = await prisma.response.findUnique({
+      where: {
+        formId_email: {
+          formId: params.formId,
+          email: email,
+        },
+      },
+      include: {
+        answers: {
+          include: {
+            question: true // Include question details for better context
+          }
+        },
+      },
+    })
+
+    if (!existingResponse) {
+      return NextResponse.json(
+        { error: 'No existing response found' },
+        { status: 404 }
+      )
+    }
+
+    // Format previous answers for comparison
+    const previousAnswers = existingResponse.answers.map(answer => ({
+      questionId: answer.questionId,
+      questionTitle: answer.question.title,
+      previousValue: answer.value,
+      newValue: answers.find(a => a.questionId === answer.questionId)?.value || null
+    }))
+
+    // Delete existing answers
+    await prisma.answer.deleteMany({
+      where: {
+        responseId: existingResponse.id,
+      },
+    })
+
+    // Update response with new answers
+    const updatedResponse = await prisma.response.update({
+      where: {
+        id: existingResponse.id,
+      },
+      data: {
+        answers: {
+          create: answers.map((a) => ({
+            questionId: a.questionId,
+            value: a.value,
+          })),
+        },
+      },
+      include: {
+        answers: {
+          include: {
+            question: true
+          }
+        },
+      },
+    })
+
+    // Return both previous and updated responses
+    return NextResponse.json({
+      previousResponse: {
+        email: existingResponse.email,
+        createdAt: existingResponse.createdAt,
+        answers: previousAnswers
+      },
+      updatedResponse: updatedResponse
+    })
+  } catch (error) {
+    console.error('Error updating response:', error)
+    return NextResponse.json(
+      { error: 'Error updating response' },
       { status: 500 }
     )
   }
