@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { createObjectCsvWriter } from 'csv-writer'
-import path from 'path'
-import { mkdir, readFile, unlink } from 'fs/promises'
+import * as XLSX from 'xlsx'
 
 export async function GET(request, { params }) {
   try {
@@ -28,63 +26,53 @@ export async function GET(request, { params }) {
       )
     }
 
-    // Check if CSV export is requested
     const searchParams = new URL(request.url).searchParams
     const format = searchParams.get('format')
 
-    if (format === 'csv') {
+    if (format === 'excel') {
+      // Create headers row
       const headers = [
-        { id: 'email', title: 'Email' },
-        { id: 'submittedAt', title: 'Submitted At' },
-        ...form.questions.map((q) => ({
-          id: q.id,
-          title: q.title,
-        })),
+        'Email',
+        'Submitted At',
+        ...form.questions.map(q => q.title)
       ]
 
-      const records = form.responses.map((response) => {
-        const record = {
-          email: response.email,
-          submittedAt: response.createdAt.toISOString(),
-        }
-
-        form.questions.forEach((question) => {
-          const answer = response.answers.find(
-            (a) => a.questionId === question.id
-          )
-          record[question.id] = answer?.value || ''
+      // Create data rows
+      const rows = form.responses.map(response => [
+        response.email,
+        response.createdAt.toISOString(),
+        ...form.questions.map(question => {
+          const answer = response.answers.find(a => a.questionId === question.id)
+          return answer?.value || ''
         })
+      ])
 
-        return record
+      // Combine headers and data
+      const data = [headers, ...rows]
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new()
+      const ws = XLSX.utils.aoa_to_sheet(data)
+
+      // Set column widths
+      const colWidths = headers.map(() => ({ wch: 20 }))
+      ws['!cols'] = colWidths
+
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Responses')
+
+      // Generate buffer
+      const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
+
+      return new NextResponse(excelBuffer, {
+        headers: {
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'Content-Disposition': `attachment; filename="${form.title}-responses.xlsx"`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        },
       })
-
-      try {
-        const tmpDir = path.join(process.cwd(), 'tmp')
-        await mkdir(tmpDir, { recursive: true })
-
-        const csvPath = path.join(tmpDir, `form-${params.formId}.csv`)
-        const csvWriter = createObjectCsvWriter({
-          path: csvPath,
-          header: headers,
-        })
-
-        await csvWriter.writeRecords(records)
-        const fileContent = await readFile(csvPath)
-        await unlink(csvPath).catch(console.error)
-
-        return new NextResponse(fileContent, {
-          headers: {
-            'Content-Type': 'text/csv; charset=utf-8',
-            'Content-Disposition': `attachment; filename="${form.title}-responses.csv"`,
-          },
-        })
-      } catch (error) {
-        console.error('Error generating CSV:', error)
-        return NextResponse.json(
-          { error: 'Error generating CSV' },
-          { status: 500 }
-        )
-      }
     }
 
     return NextResponse.json(form.responses)

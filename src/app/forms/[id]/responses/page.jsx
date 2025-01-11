@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { ResponsesList } from '@/app/components/ResponsesList'
+import ExportButton from '@/app/components/ExportButton' 
 
 export default async function ResponsesPage({ params }) {
   const form = await prisma.form.findUnique({
@@ -20,13 +21,7 @@ export default async function ResponsesPage({ params }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-6">
-        <a
-          href={`/api/forms/${form.id}/responses?format=csv`}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          download={`${form.title}-responses.csv`}
-        >
-          Export CSV
-        </a>
+        <ExportButton formId={form.id} formTitle={form.title} />
         <a className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600' href="/">back</a>
       </div>
       <ResponsesList form={form} />
