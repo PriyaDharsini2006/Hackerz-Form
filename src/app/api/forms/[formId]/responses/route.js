@@ -30,14 +30,12 @@ export async function GET(request, { params }) {
     const format = searchParams.get('format')
 
     if (format === 'excel') {
-      // Create headers row
       const headers = [
         'Email',
         'Submitted At',
         ...form.questions.map(q => q.title)
       ]
 
-      // Create data rows
       const rows = form.responses.map(response => [
         response.email,
         response.createdAt.toISOString(),
@@ -47,21 +45,16 @@ export async function GET(request, { params }) {
         })
       ])
 
-      // Combine headers and data
       const data = [headers, ...rows]
 
-      // Create workbook and worksheet
       const wb = XLSX.utils.book_new()
       const ws = XLSX.utils.aoa_to_sheet(data)
 
-      // Set column widths
       const colWidths = headers.map(() => ({ wch: 20 }))
       ws['!cols'] = colWidths
 
-      // Add worksheet to workbook
       XLSX.utils.book_append_sheet(wb, ws, 'Responses')
 
-      // Generate buffer
       const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
 
       return new NextResponse(excelBuffer, {
@@ -90,22 +83,6 @@ export async function POST(request, { params }) {
     const body = await request.json()
     const { email, answers } = body
 
-    const existingResponse = await prisma.response.findUnique({
-      where: {
-        formId_email: {
-          formId: params.formId,
-          email: email,
-        },
-      },
-    })
-
-    if (existingResponse) {
-      return NextResponse.json(
-        { error: 'You have already submitted this form' },
-        { status: 400 }
-      )
-    }
-
     const response = await prisma.response.create({
       data: {
         formId: params.formId,
@@ -125,6 +102,14 @@ export async function POST(request, { params }) {
     return NextResponse.json(response, { status: 201 })
   } catch (error) {
     console.error('Error submitting response:', error)
+    
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { error: 'You have already submitted this form' },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Error submitting response' },
       { status: 500 }
@@ -137,71 +122,82 @@ export async function PUT(request, { params }) {
     const body = await request.json()
     const { email, answers } = body
 
-    const existingResponse = await prisma.response.findUnique({
-      where: {
-        formId_email: {
-          formId: params.formId,
-          email: email,
+    const result = await prisma.$transaction(async (tx) => {
+      const existingResponse = await tx.response.findUnique({
+        where: {
+          formId_email: {
+            formId: params.formId,
+            email: email,
+          },
         },
-      },
-      include: {
-        answers: {
-          include: {
-            question: true
-          }
+        include: {
+          answers: {
+            include: {
+              question: true
+            }
+          },
         },
-      },
+      })
+
+      if (!existingResponse) {
+        throw new Error('NO_RESPONSE_FOUND')
+      }
+
+      const previousAnswers = existingResponse.answers.map(answer => ({
+        questionId: answer.questionId,
+        questionTitle: answer.question.title,
+        previousValue: answer.value,
+        newValue: answers.find(a => a.questionId === answer.questionId)?.value || null
+      }))
+
+      await tx.answer.deleteMany({
+        where: {
+          responseId: existingResponse.id,
+        },
+      })
+
+      const updatedResponse = await tx.response.update({
+        where: {
+          id: existingResponse.id,
+        },
+        data: {
+          answers: {
+            create: answers.map((a) => ({
+              questionId: a.questionId,
+              value: a.value,
+            })),
+          },
+        },
+        include: {
+          answers: {
+            include: {
+              question: true
+            }
+          },
+        },
+      })
+
+      return {
+        previousResponse: {
+          email: existingResponse.email,
+          createdAt: existingResponse.createdAt,
+          answers: previousAnswers
+        },
+        updatedResponse: updatedResponse
+      }
     })
 
-    if (!existingResponse) {
+    return NextResponse.json(result)
+  } catch (error) {
+    console.error('Error updating response:', error)
+    
+    if (error.message === 'NO_RESPONSE_FOUND') {
       return NextResponse.json(
         { error: 'No existing response found' },
         { status: 404 }
       )
     }
-
-    const previousAnswers = existingResponse.answers.map(answer => ({
-      questionId: answer.questionId,
-      questionTitle: answer.question.title,
-      previousValue: answer.value,
-      newValue: answers.find(a => a.questionId === answer.questionId)?.value || null
-    }))
-    await prisma.answer.deleteMany({
-      where: {
-        responseId: existingResponse.id,
-      },
-    })
-    const updatedResponse = await prisma.response.update({
-      where: {
-        id: existingResponse.id,
-      },
-      data: {
-        answers: {
-          create: answers.map((a) => ({
-            questionId: a.questionId,
-            value: a.value,
-          })),
-        },
-      },
-      include: {
-        answers: {
-          include: {
-            question: true
-          }
-        },
-      },
-    })
-
-    return NextResponse.json({
-      previousResponse: {
-        email: existingResponse.email,
-        createdAt: existingResponse.createdAt,
-        answers: previousAnswers
-      },
-      updatedResponse: updatedResponse
-    })
-  } catch (error) {
-    console.error('Error updating response:', error)
+    
     return NextResponse.json(
       { error: 'Error updating response' },
       { status: 500 }

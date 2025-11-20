@@ -36,7 +36,6 @@ export async function GET(
     const format = searchParams.get('format')
 
     if (format === 'csv') {
-      // Format data for CSV
       const headers = [
         { id: 'email', title: 'Email' },
         { id: 'submittedAt', title: 'Submitted At' },
@@ -121,7 +120,7 @@ export async function POST(
       )
     }
 
-    // Create response with answers
+    // Create response with ans
     const response = await prisma.response.create({
       data: {
         formId: params.formId,

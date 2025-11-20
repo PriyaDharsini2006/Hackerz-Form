@@ -35,7 +35,6 @@ export function FormView({ form }) {
           if (response.ok) {
             const data = await response.json();
             setExistingResponse(data);
-            // Pre-fill the answers
             const existingAnswers = {};
             data.answers.forEach(answer => {
               existingAnswers[answer.questionId] = answer.value;
