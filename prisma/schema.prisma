@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id      Int      @id @default(autoincrement())
+  email String @unique
+}
+
+model Form {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  link        String?
+  color       String     @default("#9333EA") 
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  questions   Question[]
+  responses   Response[]
+}
+
+
+model Question {
+  id       String   @id @default(cuid())
+  formId   String
+  type     String
+  title    String
+  options  String[]
+  required Boolean  @default(false)
+  order    Int
+  imageUrl String?
+  link     String?
+  answers  Answer[]
+  form     Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+}
+
+model Response {
+  id        String   @id @default(cuid())
+  formId    String
+  createdAt DateTime @default(now())
+  email     String
+  answers   Answer[]
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@unique([formId, email])
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  responseId String
+  questionId String
+  value      String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+}
