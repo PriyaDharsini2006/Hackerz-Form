@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth/next'
-import { prisma } from '@/lib/prisma'
+import prisma from "@/lib/prisma";
+
 import { Plus, Eye, LineChart, Play, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { revalidatePath } from 'next/cache'

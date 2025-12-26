@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import  prisma  from '@/lib/prisma'
 import { ResponsesList } from '@/app/components/ResponsesList'
 import ExportButton from '@/app/components/ExportButton' 
 

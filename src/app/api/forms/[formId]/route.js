@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import  prisma  from '@/lib/prisma'
 import { createObjectCsvWriter } from 'csv-writer'
 import path from 'path'
 import { mkdir, readFile } from 'fs/promises'
