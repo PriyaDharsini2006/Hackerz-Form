@@ -6,7 +6,6 @@ const DeleteFormDialog = ({ formId, formTitle, deleteForm }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const dialogRef = useRef(null);
 
-  // Handle escape key press
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {

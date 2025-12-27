@@ -3,7 +3,7 @@ import  prisma  from '@/lib/prisma'
 
 export async function GET(request, { params }) {
   try {
-    const { formId, email } = params
+    const { formId, email } = await params
 
     const response = await prisma.response.findUnique({
       where: {

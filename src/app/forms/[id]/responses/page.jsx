@@ -3,8 +3,9 @@ import { ResponsesList } from '@/app/components/ResponsesList'
 import ExportButton from '@/app/components/ExportButton' 
 
 export default async function ResponsesPage({ params }) {
+  const {id}=await params;
   const form = await prisma.form.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       questions: { orderBy: { order: 'asc' } },
       responses: {

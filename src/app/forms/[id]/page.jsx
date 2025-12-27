@@ -2,8 +2,9 @@ import  prisma from '@/lib/prisma'
 import { FormView } from '@/app/components/FormView'
 
 export default async function FormPage({ params  }) {
+  const {id}=await params;
   const form = await prisma.form.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { questions: { orderBy: { order: 'asc' } } }
   })
 

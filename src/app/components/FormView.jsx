@@ -167,7 +167,7 @@ export function FormView({ form }) {
                   You're updating your previous response
                 </p>
                 <p className="text-gray-300 text-xs sm:text-sm">
-                  Last submitted: {new Date(existingResponse.updatedAt).toLocaleString()}
+                  Last submitted: {new Date(existingResponse.createdAt).toLocaleString()}
                 </p>
               </div>
             )}

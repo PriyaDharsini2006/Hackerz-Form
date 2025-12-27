@@ -210,6 +210,7 @@ export function FormBuilder() {
             height={40}
             className="object-contain mt-[-10px]"
           />
+          
           <p className='text-white text-4xl sm:text-6xl font-hacked'>Hackerz <span className='text-purple-500'>Forms</span></p>
           <Image
             src="/logo1.png"
@@ -298,23 +299,25 @@ export function FormBuilder() {
                 onChange={(e) => handleImageUpload(question.id, e.target.files[0])}
                 className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-900 file:text-purple-300 hover:file:bg-purple-800 transition-colors"
               />
-              {question.imageUrl && (
-                <div className="mt-2 relative h-32 sm:h-40 w-full">
-                  <Image
-                    src={question.imageUrl}
-                    alt="Question image"
-                    fill
-                    className="object-contain rounded-lg"
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                  />
-                  <button
-                    onClick={() => updateQuestion(question.id, { imageUrl: '' })}
-                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              )}
+           {question.imageUrl && (
+  <div className="mt-2 relative h-32 sm:h-40 w-full">
+    <Image
+      src={question.imageUrl}
+      alt="Question image"
+      fill
+      className="object-contain rounded-lg"
+      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+    />
+    <button
+      type="button"
+      onClick={() => updateQuestion(question.id, { imageUrl: '' })}
+      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+    >
+      <X size={16} />
+    </button>
+  </div>
+)}
+
             </div>
 
             {(question.type === 'multiple' || question.type === 'dropdown' || question.type === 'checkbox') && (
