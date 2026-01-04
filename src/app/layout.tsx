@@ -19,11 +19,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Hackerz Forms",
     description: "Forms, but make it Hackerz.",
-    url: "https://forms.hackerzcit.in",
+    url: "https://hackerz-form.vercel.app",
     siteName: "Hackerz Forms",
     images: [
       {
-        url: "https://forms.hackerzcit.in/url_logo.png",
+        url: "https://hackerz-form.vercel.app/url_logo.png",
         width: 1200,
         height: 630,
         alt: "Hackerz Forms Preview",
