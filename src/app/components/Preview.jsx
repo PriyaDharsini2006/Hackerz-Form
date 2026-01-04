@@ -12,6 +12,7 @@ export function Preview({ form: initialForm }) {
   const [answers, setAnswers] = useState({})
   const [isSaving, setIsSaving] = useState(false)
   const [draggedQuestion, setDraggedQuestion] = useState(null)
+  const [imageLoading, setImageLoading] = useState({})
 
   const handleDragStart = (e, questionId) => {
     setDraggedQuestion(questionId)
@@ -94,41 +95,35 @@ export function Preview({ form: initialForm }) {
 
 
   const handleImageUpload = async (id, file) => {
-    if (!file) return
+    if (!file || imageLoading[id]) return
+
+    setImageLoading((p) => ({ ...p, [id]: true }))
 
     try {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
+      const base64 = await new Promise((res, rej) => {
+        const r = new FileReader()
+        r.onloadend = () => res(r.result)
+        r.onerror = rej
+        r.readAsDataURL(file)
+      })
 
-      reader.onloadend = async () => {
-        const base64String = reader.result
+      const resp = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: base64 })
+      })
 
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            image: base64String
-          }),
-        })
+      if (!resp.ok) throw new Error()
 
-        if (response.ok) {
-          const { url } = await response.json()
-          updateQuestion(id, { imageUrl: url })
-        } else {
-          throw new Error('Upload failed')
-        }
-      }
-
-      reader.onerror = () => {
-        throw new Error('Failed to read file')
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error)
-      alert('Failed to upload image. Please try again.')
+      const { url } = await resp.json()
+      updateQuestion(id, { imageUrl: url })
+    } catch {
+      alert('Image upload failed')
+    } finally {
+      setImageLoading((p) => ({ ...p, [id]: false }))
     }
   }
+
 
   const toggleFormActive = async () => {
     const updatedForm = {
@@ -386,28 +381,41 @@ export function Preview({ form: initialForm }) {
                       <input
                         type="file"
                         accept="image/*"
+                        disabled={imageLoading[question.id]}
                         onChange={(e) => handleImageUpload(question.id, e.target.files[0])}
-                        className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-900 file:text-purple-300 hover:file:bg-purple-800 transition-colors"
+                        className="block w-full text-sm text-gray-400 disabled:opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-purple-900 file:text-purple-300"
                       />
-                      {question.imageUrl && (
-                        <div className="mt-2 relative h-40 w-full">
-                          <Image
-                            src={question.imageUrl}
-                            alt="Question image"
-                            fill
-                            className="object-contain rounded-lg"
-                          />
-                          <button
-                            onClick={() => updateQuestion(question.id, { imageUrl: '' })}
-                            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                          >
-                            <X size={16} />
-                          </button>
+                      {(question.imageUrl || imageLoading[question.id]) && (
+                        <div className="mt-2 relative h-40 w-full rounded-lg overflow-hidden border border-gray-700">
+                          {imageLoading[question.id] && (
+                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+                              <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                            </div>
+                          )}
+
+                          {question.imageUrl && (
+                            <Image
+                              src={question.imageUrl}
+                              alt="Question image"
+                              fill
+                              className={`object-contain ${
+                                imageLoading[question.id] ? 'blur-sm' : ''
+                              }`}
+                            />
+                          )}
+
+                          {!imageLoading[question.id] && question.imageUrl && (
+                            <button
+                              onClick={() => updateQuestion(question.id, { imageUrl: '' })}
+                              className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full"
+                            >
+                              <X size={16} />
+                            </button>
+                          )}
                         </div>
                       )}
 
                     </div>
-
                   </div>
                 ) : (
                   <div className="mb-4">
